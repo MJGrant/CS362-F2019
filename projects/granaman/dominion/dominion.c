@@ -787,7 +787,7 @@ int cardMinion(int currentPlayer, int choice1, int choice2, struct gameState *st
 
 int cardMine(int currentPlayer, int choice1, int choice2, struct gameState *state, int handPos)
 {
-    int j = state->hand[currentPlayer][choice1];  //store card we will trash
+    int cardToTrash = state->hand[currentPlayer][choice1];  //store card we will trash
 
     if (state->hand[currentPlayer][choice1] < copper || state->hand[currentPlayer][choice1] > gold)
     {
@@ -812,7 +812,7 @@ int cardMine(int currentPlayer, int choice1, int choice2, struct gameState *stat
     //discard trashed card
     for (int i = 0; i < state->handCount[currentPlayer]; i++)
     {
-        if (state->hand[currentPlayer][i] == j)
+        if (state->hand[currentPlayer][i] == cardToTrash)
         {
             discardCard(i, currentPlayer, state, 0);
             break;
