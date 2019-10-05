@@ -824,7 +824,9 @@ int cardMine(int currentPlayer, int choice1, int choice2, struct gameState *stat
 
 int cardAmbassador(int currentPlayer, int choice1, int choice2, struct gameState *state, int handPos)
 {
-    int j = 0;      //used to check if player has enough cards to discard
+    //choice2 represents how many cards the player has chosen to discard
+    //cardCount will be used to see if the player actually has that many
+    int cardCount = 0;
 
     if (choice2 > 2 || choice2 < 0)
     {
@@ -840,11 +842,12 @@ int cardAmbassador(int currentPlayer, int choice1, int choice2, struct gameState
     {
         if (i != handPos && i == state->hand[currentPlayer][choice1] && i != choice1)
         {
-            j++;
+            cardCount++;
         }
     }
-    if (j < choice2)
+    if (cardCount < choice2)
     {
+        // player does not have enough cards in their hand
         return -1;
     }
 
