@@ -739,7 +739,7 @@ int cardMinion(int currentPlayer, int choice1, int choice2, struct gameState *st
     state->numActions++;
 
     //discard card from hand
-    discardCard(handPos, currentPlayer, state, 0);
+    discardCard(handPos, currentPlayer, state, 1);
 
     if (choice1)
     {
@@ -754,7 +754,7 @@ int cardMinion(int currentPlayer, int choice1, int choice2, struct gameState *st
         }
 
         //draw 4
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i <= 4; i++)
         {
             drawCard(currentPlayer, state);
         }
@@ -890,6 +890,10 @@ int cardTribute(int currentPlayer, struct gameState *state)
     int nextPlayer = currentPlayer + 1;
     int tributeRevealedCards[2] = {-1, -1};
 
+    if (nextPlayer > (state->numPlayers - 1)) {
+        nextPlayer = 0;
+    }
+
     if ((state->discardCount[nextPlayer] + state->deckCount[nextPlayer]) <= 1) {
         if (state->deckCount[nextPlayer] > 0) {
             tributeRevealedCards[0] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
@@ -957,15 +961,11 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
     int x;
     int index;
     int currentPlayer = whoseTurn(state);
-    int nextPlayer = currentPlayer + 1;
 
     int temphand[MAX_HAND];// moved above the if statement
     int drawntreasure=0;
     int cardDrawn;
     int z = 0;// this is the counter for the temp hand
-    if (nextPlayer > (state->numPlayers - 1)) {
-        nextPlayer = 0;
-    }
 
     //uses switch to select card and perform actions
     switch( card )
