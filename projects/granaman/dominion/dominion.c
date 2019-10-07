@@ -898,11 +898,15 @@ int cardTribute(int currentPlayer, struct gameState *state)
         nextPlayer = 0;
     }
 
+    // If the player to the left (nextPlayer) has 1 or fewer cards total between their discard and deck piles
     if ((state->discardCount[nextPlayer] + state->deckCount[nextPlayer]) <= 1) {
+        // If the next player has 1 or more cards in their deck, take from the deck
         if (state->deckCount[nextPlayer] > 0) {
             tributeRevealedCards[0] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
             state->deckCount[nextPlayer]--;
         }
+        // if the player didn't have anything in their deck,
+        // see if they have a card in their discard pile to reveal
         else if (state->discardCount[nextPlayer] > 0) {
             tributeRevealedCards[0] = state->discard[nextPlayer][state->discardCount[nextPlayer]-1];
             state->discardCount[nextPlayer]--;
@@ -915,7 +919,10 @@ int cardTribute(int currentPlayer, struct gameState *state)
         }
     }
 
+    // the nextPlayer has more than 1 card total
     else {
+        // if none of those cards are in the deck, then they must be in the discard pile
+        // take 1 card from the discard pile and move it to the deck, then shuffle the deck
         if (state->deckCount[nextPlayer] == 0) {
             for (int i = 0; i < state->discardCount[nextPlayer]; i++) {
                 state->deck[nextPlayer][i] = state->discard[nextPlayer][i];//Move to deck
@@ -926,6 +933,7 @@ int cardTribute(int currentPlayer, struct gameState *state)
 
             shuffle(nextPlayer,state);//Shuffle the deck
         }
+        // now all the cards are in the deck, so take the top 2 and set them to the tributeRevealedCards
         tributeRevealedCards[0] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
         state->deck[nextPlayer][state->deckCount[nextPlayer]--] = -1;
         state->deckCount[nextPlayer]--;
