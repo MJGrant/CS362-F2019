@@ -788,7 +788,7 @@ int cardMine(int currentPlayer, int choice1, int choice2, struct gameState *stat
 {
     int cardToTrash = state->hand[currentPlayer][choice1];  //store card we will trash
 
-    if (state->hand[currentPlayer][choice1] < copper || state->hand[currentPlayer][choice1] => gold)
+    if (state->hand[currentPlayer][choice1] < copper || state->hand[currentPlayer][choice1] > gold)
     {
         return -1;
     }
