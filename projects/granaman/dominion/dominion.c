@@ -722,7 +722,7 @@ int cardBaron(int currentPlayer, int choice1, struct gameState *state)
         if (supplyCount(estate, state) > 0) {
             gainCard(estate, state, 0, currentPlayer);//Gain an estate
 
-            state->supplyCount[estate]--;//Decrement Estates
+            state->supplyCount[estate] = 0;//Decrement Estates
             if (supplyCount(estate, state) == 0) {
                 isGameOver(state);
             }
