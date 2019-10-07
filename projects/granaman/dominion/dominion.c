@@ -849,11 +849,6 @@ int cardAmbassador(int currentPlayer, int choice1, int choice2, struct gameState
             cardCount++;
         }
     }
-    if (cardCount < choice2)
-    {
-        // player does not have enough cards in their hand, this is an error state
-        return -1;
-    }
 
     if (DEBUG)
         printf("Player %d reveals card number: %d\n", currentPlayer, state->hand[currentPlayer][choice1]);
