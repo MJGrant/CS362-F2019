@@ -712,7 +712,6 @@ int cardBaron(int currentPlayer, int choice1, struct gameState *state)
                         isGameOver(state);
                     }
                 }
-                card_not_discarded = 0;//Exit the loop
             }
 
             else {
