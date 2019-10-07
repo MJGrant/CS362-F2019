@@ -830,7 +830,7 @@ int cardAmbassador(int currentPlayer, int choice1, int choice2, struct gameState
     int cardCount = 0;
 
     //player picked too many or a negative quantity of cards to discard, this is an error state
-    if (choice2 > 2 || choice2 < 0)
+    if (choice2 > 2 || choice2 <= 0)
     {
         return -1;
     }
