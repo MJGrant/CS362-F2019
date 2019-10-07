@@ -824,20 +824,24 @@ int cardMine(int currentPlayer, int choice1, int choice2, struct gameState *stat
 
 int cardAmbassador(int currentPlayer, int choice1, int choice2, struct gameState *state, int handPos)
 {
-    //choice2 represents how many cards the player has chosen to discard
+    //choice1 represents the card the player has chosen to discard
+    //choice2 represents how many of that card the player has chosen to discard
     //cardCount will be used to see if the player actually has that many
     int cardCount = 0;
 
+    //player picked too many or a negative quantity of cards to discard, this is an error state
     if (choice2 > 2 || choice2 < 0)
     {
         return -1;
     }
 
+    //the player is attempting to discard the ambassador card itself, this is an error state
     if (choice1 == handPos)
     {
         return -1;
     }
 
+    //step through the player's hand and see if they have enough of the card they want to get rid of
     for (int i = 0; i < state->handCount[currentPlayer]; i++)
     {
         if (i != handPos && i == state->hand[currentPlayer][choice1] && i != choice1)
@@ -847,7 +851,7 @@ int cardAmbassador(int currentPlayer, int choice1, int choice2, struct gameState
     }
     if (cardCount < choice2)
     {
-        // player does not have enough cards in their hand
+        // player does not have enough cards in their hand, this is an error state
         return -1;
     }
 
@@ -857,16 +861,21 @@ int cardAmbassador(int currentPlayer, int choice1, int choice2, struct gameState
     //increase supply count for choosen card by amount being discarded
     state->supplyCount[state->hand[currentPlayer][choice1]] += choice2;
 
-    //each other player gains a copy of revealed card
+    // Each other player gains a copy of revealed card
+    // MJG note: Added cardCount > 0 check to ensure cards aren't being made out of thin air
+    // Consider an example where the player decides to discard 1 copy but there are 2 opponents
+    // Without a check against cardCount, the game would run gainCard for every opponent and effectively
+    // produce cards out of thin air
     for (int i = 0; i < state->numPlayers; i++)
     {
-        if (i != currentPlayer)
+        if (i != currentPlayer && cardCount > 0)
         {
             gainCard(state->hand[currentPlayer][choice1], state, 0, i);
+            cardCount--;
         }
     }
 
-    //discard played card from hand
+    //discard played card from hand (discard Ambassador card)
     discardCard(handPos, currentPlayer, state, 0);
 
     //trash copies of cards returned to supply
