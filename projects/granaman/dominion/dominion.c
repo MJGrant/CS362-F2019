@@ -798,27 +798,30 @@ int cardMine(int currentPlayer, int choice1, int choice2, struct gameState *stat
         return -1;
     }
 
-    if ( (getCost(state->hand[currentPlayer][choice1]) + 3) > getCost(choice2) )
+    // if the value of the card the player is trashing + 3 is greater than or equal to the cost of the
+    // card the player wants to get, let the trade happen
+    if ((getCost(state->hand[currentPlayer][choice1]) + 3 >= getCost(choice2))
     {
-        return -1;
-    }
-
-    gainCard(choice2, state, 1, currentPlayer);
-
-    //discard card from hand
-    discardCard(handPos, currentPlayer, state, 0);
-
-    //discard trashed card
-    for (int i = 0; i < state->handCount[currentPlayer]; i++)
-    {
+      //let the trade happen
+      gainCard(choice2, state, 1, currentPlayer);
+      //discard card from hand
+      discardCard(handPos, currentPlayer, state, 0);
+      //discard trashed card
+      for (int i = 0; i < state->handCount[currentPlayer]; i++)
+      {
         if (state->hand[currentPlayer][i] == cardToTrash)
         {
-            discardCard(i, currentPlayer, state, 0);
-            break;
+          discardCard(i, currentPlayer, state, 0);
+          break;
         }
+      }
+      return 0;
     }
-
-    return 0;
+    else
+    {
+      // card is outside the range allowed
+      return -1;
+    }
 }
 
 int cardAmbassador(int currentPlayer, int choice1, int choice2, struct gameState *state, int handPos)
