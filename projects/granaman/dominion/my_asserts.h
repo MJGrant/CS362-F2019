@@ -3,7 +3,7 @@
 
 // myAsserts method signatures
 
-void assertEqual(int param1, int param2);
-void assertNotEqual(int param1, int param2);
+void assertEqual(char *testName, int param1, int param2);
+void assertNotEqual(char *testName, int param1, int param2);
 
 #endif
