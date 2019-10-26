@@ -17,8 +17,8 @@ void printTestName(char *testName, char *testString) {
     printf("[%s] - %s\n", testName, testString);
 }
 
-void baronTest1() {
-    printTestName("Baron Card", "Elect to gain an estate card");
+void baronTest1a() {
+    printTestName("Baron Card", "Player draws an estate card from the stocked estate supply pile");
 
     // arrange
     struct gameState state;
@@ -49,13 +49,70 @@ void baronTest1() {
 
     // verify that an estate card was added to the last position of the player's deck
     assertEqual("Estate card added to player's discard pile", state.discard[currentPlayer][state.discardCount[currentPlayer]-1], estate);
-
-    // TODO: what happens when no estate card exists, re-arrange and re-verify
 }
 
-void baronTest2() {
+void baronTest1b() {
+    printTestName("Baron Card", "Player draws estate card from the empty estate supply pile");
 
-    printTestName("Baron Card", "Elect to trade one of the player's estate cards for +4 coins");
+    // arrange
+    struct gameState state;
+    int k[10] = {1,2,3,4,5,6,7,8,9,10};
+    int currentPlayer = 1;
+    initializeGame(2, k, 2, &state);
+
+    int coinsBefore = state.coins;
+    int discardCountBefore = state.discardCount[currentPlayer];
+    int numBuysBefore = state.numBuys; // save: numBuys
+    state.supplyCount[estate] = 0; // set supply pile for estates to zero
+    int estateSupplyBefore = state.supplyCount[estate]; // record that zero
+
+    // set the player's hand to a specific arrangement of cards
+    state.handCount[currentPlayer] = 4;
+    state.hand[currentPlayer][0] = baron;
+    state.hand[currentPlayer][1] = estate; // one estate in hand but shouldn't affect outcome
+    state.hand[currentPlayer][2] = copper;
+    state.hand[currentPlayer][3] = baron;
+    int estateCountBefore = 1;
+
+    int handCountBefore = state.handCount[currentPlayer];
+
+    // act
+    // passing a zero as the second param indicates user wants to gain an estate
+    cardBaron(currentPlayer, 0, &state);
+
+    // assert
+    // verify that the player did not get an estate card
+    int estateCountAfter = 0;
+    for (int i = 0; i < state.handCount[currentPlayer]; i++) {
+        if (state.hand[currentPlayer][i] == estate) {
+            estateCountAfter++;
+        }
+    }
+
+    // verify that the player got +1 buy for playing this card
+    // note/possible bug: the +1 Buy never seems to get spent but it's also not required that it be spent
+    assertIncreasedByOne("Player gains +1 Buy", numBuysBefore, state.numBuys);
+
+    assertEqual("Player did not gain an estate card", estateCountBefore, estateCountAfter);
+
+    // verify that the player didn't gain or lose any other cards in their hand
+    assertEqual("Player did not gain any cards in their hand", handCountBefore, state.handCount[currentPlayer]);
+
+    // verify that the player didn't gain or lose any cards in their deck
+    assertEqual("Player did not gain any cards in their discard pile", discardCountBefore, state.discardCount[currentPlayer]);
+
+    assertEqual("Estate supply count remains the same", estateSupplyBefore, state.supplyCount[estate]);
+    assertEqual("Estate supply count is 0", estateSupplyBefore, 0);
+
+    // verify that the player did not collect +4 coins because they spent this turn on getting an estate instead
+    assertEqual("Current player did not receive +4 coins", coinsBefore, state.coins);
+
+
+}
+
+void baronTest2a() {
+
+    printTestName("Baron Card", "Player discards one estate card from her hand for +4 coins");
 
     // arrange
     struct gameState state;
@@ -109,8 +166,8 @@ void baronTest2() {
     assertDecreasedByOne("[KNOWN BUG] Player's hand has one fewer Estate cards in it", estateCountBefore, estateCountAfter);
 }
 
-void baronTest3() {
-    printTestName("Baron Card", "Attempt to trade an estate card for +4 coins when the player has no estates but the supply pile does");
+void baronTest2b1() {
+    printTestName("Baron Card", "Player discards one estate card from her hand for +4 coins when the player has no estates but the supply pile does");
 
     // arrange
     struct gameState state;
@@ -151,7 +208,7 @@ void baronTest3() {
     assertEqual("Current player did not receive +4 coins", coinsBefore, state.coins);
 }
 
-void baronTest4() {
+void baronTest2b2() {
     printTestName("Baron Card", "Attempt to trade an estate card for +4 coins when neither the player nor the supply pile has an estate to give");
 
     // arrange
@@ -208,10 +265,11 @@ void baronTest4() {
 
 int main() {
 
-    baronTest1();
-    baronTest2();
-    baronTest3();
-    baronTest4();
+    baronTest1a();
+    baronTest1b();
+    baronTest2a();
+    baronTest2b1();
+    baronTest2b2();
 
     printf("[Baron Card test] Test complete\n");
     return 0;
