@@ -18,8 +18,7 @@ void printTestName(char *testName, char *testString) {
     printf("[%s] - %s\n", testName, testString);
 }
 
-int main() {
-
+void baronTest1() {
     printTestName("Baron Card", "Elect to gain an estate card");
 
     // arrange
@@ -28,38 +27,36 @@ int main() {
     int currentPlayer = 1;
     initializeGame(2, k, 2, &state);
 
-    int handCountBefore = state.handCount[currentPlayer];
     int discardCountBefore = state.discardCount[currentPlayer];
     int numBuysBefore = state.numBuys; // save: numBuys
     int estateSupplyBefore = state.supplyCount[estate]; //save: how many estates are in the supply
 
     // act
+    // passing a zero as the second param indicates user wants to gain an estate
     cardBaron(currentPlayer, 0, &state);
 
-    printf("hand count: %d\n", state.handCount[currentPlayer]);
-
-    // asserts
+    // assert
 
     // verify that the player got +1 buy for playing this card
     // note/possible bug: the +1 Buy never seems to get spent but it's also not required that it be spent
-    assertEqual("Player gains +1 Buy", state.numBuys, numBuysBefore+1);
-
-    // verify that the player gained one estate card
-    assertEqual("Hand count increased by 1", state.handCount[currentPlayer], handCountBefore+1);
+    assertIncreasedByOne("Player gains +1 Buy", numBuysBefore, state.numBuys);
 
     // verify that one estate card was removed from the supply
     // FAILS because line 725 erroneously sets state->supplyCount[estate] = 0;
-    assertEqual("Supply pile estate count decreased by 1", state.supplyCount[estate], estateSupplyBefore-1);
+    assertDecreasedByOne("[KNOWN BUG] Estate supply pile count decreased by 1", estateSupplyBefore, state.supplyCount[estate]);
 
-    // verify that the player's discard pile count went up by one
-    assertEqual("Discard count went up by 1", state.discardCount[currentPlayer], discardCountBefore+1);
+    // verify that the player's discard pile count went up by 1
+    assertIncreasedByOne("Player's discard pile count increased by 1", discardCountBefore, state.discardCount[currentPlayer]);
 
-    // verify that an estate card was added to the last FILLED position of the player's deck
+    // verify that an estate card was added to the last position of the player's deck
     assertEqual("Estate card added to player's discard pile", state.discard[currentPlayer][state.discardCount[currentPlayer]-1], estate);
 
+    // TODO: what happens when no estate card exists, re-arrange and re-verify
+}
 
-    // ***********************
-    printTestName("Baron Card", "Elect to gain an estate card");
+void baronTest2() {
+
+    printTestName("Baron Card", "Elect to trade one of the player's estate cards for +4 coins");
 
     // arrange
     struct gameState state;
@@ -67,17 +64,98 @@ int main() {
     int currentPlayer = 1;
     initializeGame(2, k, 2, &state);
 
+    // set the player's hand to a specific arrangement of cards
+    state.handCount[currentPlayer] = 4;
+    state.hand[currentPlayer][0] = baron;
+    state.hand[currentPlayer][1] = estate; // the loop should find and remove this estate
+    state.hand[currentPlayer][2] = estate;
+    state.hand[currentPlayer][3] = baron;
+
+    int estateCountBefore = 2;
+
+    int coinsBefore = state.coins;
     int handCountBefore = state.handCount[currentPlayer];
     int discardCountBefore = state.discardCount[currentPlayer];
-    int numBuysBefore = state.numBuys; // save: numBuys
-    int estateSupplyBefore = state.supplyCount[estate]; //save: how many estates are in the supply
 
     // act
-    cardBaron(currentPlayer, 0, &state);
+    // passing a 1 as the middle param indicates user wants to trade an estate for 4 gold
+    cardBaron(currentPlayer, 1, &state);
+
+    // assert
+
+    // verify that the user gained +4 gold
+    assertEqual("Current player received +4 coins", state.coins, coinsBefore+4);
+
+    // verify that the player's discard pile count went up by 1
+    assertIncreasedByOne("Player's discard pile count increased by 1", discardCountBefore, state.discardCount[currentPlayer]);
+
+    // verify that the Estate card was put in the player's discard pile
+    assertEqual("Estate card added to player's discard pile", state.discard[currentPlayer][state.discardCount[currentPlayer]-1], estate);
+
+    // verify that the player's hand count is decreased by 1
+    assertDecreasedByOne("Player's hand count decreases by one", handCountBefore, state.handCount[currentPlayer]);
+
+    // verify that an Estate card was removed from the player's hand
+    int estateCountAfter = 0;
+    for (int i = 0; i < state.handCount[currentPlayer]; i++) {
+        if (state.hand[currentPlayer][i] == estate) {
+            estateCountAfter++;
+        }
+    }
+
+    // FAILS because the loop that fills the gap left from removing
+    // an estate card doesn't start at the gap, it just starts at 0 and moves all cards left one
+    // [baron, estate, estate, baron] becomes [estate, estate, baron]
+    // could use more testing, this could have easily gone undetected given fortuitious placement of test cards
+    assertDecreasedByOne("[KNOWN BUG] Player's hand has one fewer Estate cards in it", estateCountBefore, estateCountAfter);
+}
+
+void baronTest3() {
+    printTestName("Baron Card", "Attempt to trade an estate card for +4 coins when the player has no estates but the supply pile does");
+
+    // arrange
+    struct gameState state;
+    int k[10] = {1,2,3,4,5,6,7,8,9,10};
+    int currentPlayer = 1;
+    initializeGame(2, k, 2, &state);
+
+    // set the player's hand to a specific arrangement of cards
+    // player doesn't have any estate cards
+    state.handCount[currentPlayer] = 4;
+    state.hand[currentPlayer][0] = baron;
+    state.hand[currentPlayer][1] = copper;
+    state.hand[currentPlayer][2] = copper;
+    state.hand[currentPlayer][3] = baron;
+
+    int coinsBefore = state.coins;
+    int discardCountBefore = state.discardCount[currentPlayer];
+
+    int estateSupplyBefore = state.supplyCount[estate];
+    printf("estate supply before: %d\n", estateSupplyBefore);
+    // act
+    // passing a 1 as the middle param indicates user wants to trade an estate for 4 gold
+    cardBaron(currentPlayer, 1, &state);
+
+    // verify that the player gained one estate card and the supply pile lost one estate
+    // FAILS because supply count is being decreased twice, once in cardBaron and once in gainCard
+    assertDecreasedByOne("[KNOWN BUG] Estate supply pile count decreased by 1", estateSupplyBefore, state.supplyCount[estate]);
+    assertIncreasedByOne("Player's discard pile count increased by 1", discardCountBefore, state.discardCount[currentPlayer]);
+    assertEqual("Estate card added to player's discard pile", state.discard[currentPlayer][state.discardCount[currentPlayer]-1], estate);
+
+    // verify that the player did not collect +4 coins because they spent this turn on getting an estate instead
+    assertEqual("Current player did not receive +4 coins", coinsBefore, state.coins);
+}
+
+void baronTest4() {
+    printTestName("Baron Card", "Attempt to trade an estate card for +4 gold when neither the player nor the supply pile has an estate to give");
+}
 
 
+int main() {
 
-
+    baronTest1();
+    baronTest2();
+    baronTest3();
 
     printf("[Baron Card test] Test complete\n");
     return 0;
