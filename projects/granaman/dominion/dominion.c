@@ -690,13 +690,20 @@ int cardBaron(int currentPlayer, int choice1, struct gameState *state)
         while(card_not_discarded) {
             if (state->hand[currentPlayer][p] == estate) { //Found an estate card!
                 state->coins += 4;//Add 4 coins to the amount of coins
+
+                //move the estate card we found into the player's discard pile
                 state->discard[currentPlayer][state->discardCount[currentPlayer]] = state->hand[currentPlayer][p];
                 state->discardCount[currentPlayer]++;
-                for (; p < state->handCount[currentPlayer]; p++) {
+
+                // fill the gap left by the estate card discarded from player's hand
+                for (p = 0; p < state->handCount[currentPlayer]; p++) {
                     state->hand[currentPlayer][p] = state->hand[currentPlayer][p+1];
                 }
+
+                // reduce the overall size of the player's hand by 1
                 state->hand[currentPlayer][state->handCount[currentPlayer]] = -1;
                 state->handCount[currentPlayer]--;
+
                 card_not_discarded = 0;//Exit the loop
             }
             else if (p > state->handCount[currentPlayer]) {
