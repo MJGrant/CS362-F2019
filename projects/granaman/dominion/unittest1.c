@@ -5,8 +5,7 @@
 #include <time.h>
 
 // ************************
-// Unit test for Baron card
-// Tests:
+// Unit tests for Baron card
 
 // initializeGame params: int numPlayers, int kingdomCards[10], int randomSeed, struct gameState *state
 
@@ -128,17 +127,23 @@ void baronTest3() {
     state.hand[currentPlayer][3] = baron;
 
     int coinsBefore = state.coins;
+    int handCountBefore = state.handCount[currentPlayer];
     int discardCountBefore = state.discardCount[currentPlayer];
 
     int estateSupplyBefore = state.supplyCount[estate];
-    printf("estate supply before: %d\n", estateSupplyBefore);
+
     // act
     // passing a 1 as the middle param indicates user wants to trade an estate for 4 gold
     cardBaron(currentPlayer, 1, &state);
 
+    // assert
     // verify that the player gained one estate card and the supply pile lost one estate
     // FAILS because supply count is being decreased twice, once in cardBaron and once in gainCard
     assertDecreasedByOne("[KNOWN BUG] Estate supply pile count decreased by 1", estateSupplyBefore, state.supplyCount[estate]);
+
+        // verify that the player didn't gain or lose any other cards in their hand
+    assertEqual("Player did not gain any cards in their hand", handCountBefore, state.handCount[currentPlayer]);
+
     assertIncreasedByOne("Player's discard pile count increased by 1", discardCountBefore, state.discardCount[currentPlayer]);
     assertEqual("Estate card added to player's discard pile", state.discard[currentPlayer][state.discardCount[currentPlayer]-1], estate);
 
@@ -147,7 +152,57 @@ void baronTest3() {
 }
 
 void baronTest4() {
-    printTestName("Baron Card", "Attempt to trade an estate card for +4 gold when neither the player nor the supply pile has an estate to give");
+    printTestName("Baron Card", "Attempt to trade an estate card for +4 coins when neither the player nor the supply pile has an estate to give");
+
+    // arrange
+    struct gameState state;
+    int k[10] = {1,2,3,4,5,6,7,8,9,10};
+    int currentPlayer = 1;
+    initializeGame(2, k, 2, &state);
+
+    // set the player's hand to a specific arrangement of cards
+    // player doesn't have any estate cards
+    state.handCount[currentPlayer] = 4;
+    state.hand[currentPlayer][0] = baron;
+    state.hand[currentPlayer][1] = copper;
+    state.hand[currentPlayer][2] = copper;
+    state.hand[currentPlayer][3] = baron;
+
+    // set the supply of estates to zero
+    state.supplyCount[estate] = 0;
+
+    int coinsBefore = state.coins;
+    int handCountBefore = state.handCount[currentPlayer];
+    int discardCountBefore = state.discardCount[currentPlayer];
+    int estateSupplyBefore = state.supplyCount[estate];
+
+    // act
+    // passing a 1 as the second param indicates user wants to trade an estate for 4 gold
+    // but in this case the player does not have an estate, nor does the supply pile
+    cardBaron(currentPlayer, 1, &state);
+
+    // assert
+    // verify that the player did not get an estate card
+    int estateCountAfter = 0;
+    for (int i = 0; i < state.handCount[currentPlayer]; i++) {
+        if (state.hand[currentPlayer][i] == estate) {
+            estateCountAfter++;
+        }
+    }
+    assertEqual("Player did not gain an estate card", 0, estateCountAfter);
+
+    // verify that the player didn't gain or lose any other cards in their hand
+    assertEqual("Player did not gain any cards in their hand", handCountBefore, state.handCount[currentPlayer]);
+
+    // verify that the player didn't gain or lose any cards in their deck
+    assertEqual("Player did not gain any cards in their discard pile", discardCountBefore, state.discardCount[currentPlayer]);
+
+    assertEqual("Estate supply count remains the same", estateSupplyBefore, state.supplyCount[estate]);
+    assertEqual("Estate supply count is 0", estateSupplyBefore, 0);
+
+    // verify that the player did not collect +4 coins because they spent this turn on getting an estate instead
+    assertEqual("Current player did not receive +4 coins", coinsBefore, state.coins);
+
 }
 
 
@@ -156,6 +211,7 @@ int main() {
     baronTest1();
     baronTest2();
     baronTest3();
+    baronTest4();
 
     printf("[Baron Card test] Test complete\n");
     return 0;
