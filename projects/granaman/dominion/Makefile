@@ -27,11 +27,15 @@ runtests: testDrawCard
 player: player.c interface.o
 	gcc -o player player.c -g dominion.o rngs.o interface.o $(CFLAGS)
 
-unittestresults: unittest1.c my_asserts.o dominion.o
-	echo "unittest1.c:" >> unittestresults.out
+unittestresults: unittest1.c unittest2.c my_asserts.o dominion.o
+	echo "unittest1.c:" > unittestresults.out
 	gcc -o unittest1 dominion.c rngs.c unittest1.c my_asserts.c $(CFLAGS)
-	./unittest1 &> unittestresults.out
-	gcov dominion.c -b >> unittestresults.out
+	./unittest1 >> unittestresults.out
+	echo "unittest2.c:" >> unittestresults.out
+	gcc -o unittest2 dominion.c rngs.c unittest2.c my_asserts.c $(CFLAGS)
+	./unittest2 >> unittestresults.out
+	echo "coverage" >> unittestresults.out
+	gcov dominion.c -b -f >> unittestresults.out
 	cat dominion.c.gcov >> unittestresults.out
 
 all: playdom player

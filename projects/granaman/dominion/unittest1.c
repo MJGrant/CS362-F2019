@@ -13,10 +13,6 @@
 // choice1 is 1 = discard an estate or gain an estate
 // choice1 is 0 = gain an estate (if there are any available)
 
-void printTestName(char *testName, char *testString) {
-    printf("[%s] - %s\n", testName, testString);
-}
-
 void baronTest1a() {
     printTestName("Baron Card", "Player draws an estate card from the stocked estate supply pile");
 
@@ -42,7 +38,7 @@ void baronTest1a() {
 
     // verify that one estate card was removed from the supply
     // FAILS because line 725 erroneously sets state->supplyCount[estate] = 0;
-    assertDecreasedByOne("[KNOWN BUG] Estate supply pile count decreased by 1", estateSupplyBefore, state.supplyCount[estate]);
+    assertDecreasedByOne("[MY INTENTIONAL BUG] Estate supply pile count decreased by 1", estateSupplyBefore, state.supplyCount[estate]);
 
     // verify that the player's discard pile count went up by 1
     assertIncreasedByOne("Player's discard pile count increased by 1", discardCountBefore, state.discardCount[currentPlayer]);

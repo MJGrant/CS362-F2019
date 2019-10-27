@@ -5,6 +5,10 @@
 #include <stdlib.h>
 #include "my_asserts.h"
 
+void printTestName(char *testName, char *testString) {
+    printf("[%s] - %s\n", testName, testString);
+}
+
 void assertEqual(char *testName, int param1, int param2) {
     if (param1 == param2) {
         printf("✔ -- %s [Passed] %d and %d are equal.\n", testName, param1, param2);

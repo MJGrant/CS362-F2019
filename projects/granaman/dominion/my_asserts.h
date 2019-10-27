@@ -2,6 +2,7 @@
 #define _MY_ASSERTS_H
 
 // myAsserts method signatures
+void printTestName(char *testName, char *testString);
 
 void assertEqual(char *testName, int param1, int param2);
 void assertNotEqual(char *testName, int param1, int param2);
