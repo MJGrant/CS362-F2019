@@ -38,7 +38,7 @@ void baronTest1a() {
 
     // verify that one estate card was removed from the supply
     // FAILS because line 725 erroneously sets state->supplyCount[estate] = 0;
-    assertDecreasedByOne("[MY INTENTIONAL BUG] Estate supply pile count decreased by 1", estateSupplyBefore, state.supplyCount[estate]);
+    assertDecreasedByOne("[MY BUG] Estate supply pile count decreased by 1", estateSupplyBefore, state.supplyCount[estate]);
 
     // verify that the player's discard pile count went up by 1
     assertIncreasedByOne("Player's discard pile count increased by 1", discardCountBefore, state.discardCount[currentPlayer]);
@@ -159,7 +159,7 @@ void baronTest2a() {
     // an estate card doesn't start at the gap, it just starts at 0 and moves all cards left one
     // [baron, estate, estate, baron] becomes [estate, estate, baron]
     // could use more testing, this could have easily gone undetected given fortuitious placement of test cards
-    assertDecreasedByOne("[KNOWN BUG] Player's hand has one fewer Estate cards in it", estateCountBefore, estateCountAfter);
+    assertDecreasedByOne("[EXISTING BUG] Player's hand has one fewer Estate cards in it", estateCountBefore, estateCountAfter);
 }
 
 void baronTest2b1() {
@@ -192,7 +192,7 @@ void baronTest2b1() {
     // assert
     // verify that the player gained one estate card and the supply pile lost one estate
     // FAILS because supply count is being decreased twice, once in cardBaron and once in gainCard
-    assertDecreasedByOne("[KNOWN BUG] Estate supply pile count decreased by 1", estateSupplyBefore, state.supplyCount[estate]);
+    assertDecreasedByOne("[EXISTING BUG] Estate supply pile count decreased by 1", estateSupplyBefore, state.supplyCount[estate]);
 
         // verify that the player didn't gain or lose any other cards in their hand
     assertEqual("Player did not gain any cards in their hand", handCountBefore, state.handCount[currentPlayer]);
