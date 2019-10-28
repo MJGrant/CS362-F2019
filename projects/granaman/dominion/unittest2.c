@@ -66,7 +66,7 @@ void minionTest1a() {
     assertEqual("The player gained +2 coins", coinsBefore+2, state.coins);
 }
 
-int minionTest2a() {
+void minionTest2a() {
     printTestName("Minion Card", "Player uses Minion to discard their entire hand as well as the hand of their opponent, who has >4 cards in hand");
 
     // arrange
@@ -86,7 +86,6 @@ int minionTest2a() {
     state.hand[currentPlayer][1] = minion;
     state.hand[currentPlayer][2] = estate;
     state.hand[currentPlayer][3] = silver;
-    int handCountBefore = state.handCount[currentPlayer];
 
     // set the player's deck so they have some cards to draw
     state.deckCount[currentPlayer] = 6;
@@ -96,7 +95,6 @@ int minionTest2a() {
     state.deck[currentPlayer][3] = copper;
     state.deck[currentPlayer][4] = copper;
     state.deck[currentPlayer][5] = copper;
-    int deckCountBefore = state.deckCount[currentPlayer];
 
     // act
     // set choice1 (2nd param) to 1 (true) to use the "get 2 coins" card option
@@ -127,7 +125,7 @@ int minionTest2a() {
     assertEqual("The player did not gain +2 coins", coinsBefore, state.coins);
 }
 
-int minionTest2b() {
+void minionTest2b() {
     printTestName("Minion Card", "Player uses Minion to discard their entire hand as well as the hand of their opponent, who only has 3 cards in hand");
 
     // arrange
