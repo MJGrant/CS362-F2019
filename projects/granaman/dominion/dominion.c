@@ -563,6 +563,7 @@ int getWinners(int players[MAX_PLAYERS], struct gameState *state) {
 int drawCard(int player, struct gameState *state)
 {   int count;
     int deckCounter;
+
     if (state->deckCount[player] <= 0) { //Deck is empty
 
         //Step 1 Shuffle the discard pile back into a deck
@@ -593,7 +594,6 @@ int drawCard(int player, struct gameState *state)
         }
 
         deckCounter = state->deckCount[player];//Create a holder for the deck count
-
         if (deckCounter == 0)
             return -1;
 
@@ -610,6 +610,7 @@ int drawCard(int player, struct gameState *state)
         }
 
         deckCounter = state->deckCount[player];//Create holder for the deck count
+
         state->hand[player][count] = state->deck[player][deckCounter - 1];//Add card to the hand
         state->deckCount[player]--;
         state->handCount[player]++;//Increment hand count
@@ -745,7 +746,8 @@ int cardMinion(int currentPlayer, int choice1, int choice2, struct gameState *st
     //+1 action
     state->numActions++;
 
-    //discard card from hand
+    // discard Minion card from hand
+    // decreases hand size by 1
     discardCard(handPos, currentPlayer, state, 1);
 
     if (choice1)
@@ -755,13 +757,25 @@ int cardMinion(int currentPlayer, int choice1, int choice2, struct gameState *st
     else if (choice2)       //discard hand, redraw 4, other players with 5+ cards discard hand and draw 4
     {
         //discard hand
+        // *** FIX *** uncomment to fix failing cardMinion test
+        /*
+        int cardsInHand = state->handCount[currentPlayer];
+        printf("There are %d cards to discard\n", cardsInHand);
+        for (int i = 0; i < cardsInHand; i++) {
+            // don't test against numHandCards() value, that changes every loop!
+            discardCard(i, currentPlayer, state, 0);
+        }
+        */
+
+        //broken version - numHandCards changes as discardCard is called repeatedly
+        //numHandCards also returns incorrect number (off by one)
         while(numHandCards(state) > 0)
         {
             discardCard(handPos, currentPlayer, state, 0);
         }
 
         //draw 4
-        for (int i = 0; i <= 4; i++)
+        for (int i = 0; i <= 4; i++) // change <= to < to fix failing cardMinion test
         {
             drawCard(currentPlayer, state);
         }
@@ -1312,9 +1326,8 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
 
 int discardCard(int handPos, int currentPlayer, struct gameState *state, int trashFlag)
 {
-
     //if card is not trashed, added to Played pile
-    if (trashFlag < 1)
+    if (trashFlag < 1) // if trashFlag is 0
     {
         //add card to played pile
         state->playedCards[state->playedCardCount] = state->hand[currentPlayer][handPos];
