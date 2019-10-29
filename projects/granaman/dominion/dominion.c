@@ -874,7 +874,6 @@ int cardAmbassador(int currentPlayer, int choice1, int choice2, struct gameState
             cardCount++;
         }
     }
-    printf("player has %d of card %d\n", cardCount, choice1);
 
     if (DEBUG)
         printf("Player %d reveals card number: %d\n", currentPlayer, choice1);
