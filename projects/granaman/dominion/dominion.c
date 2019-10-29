@@ -875,7 +875,7 @@ int cardAmbassador(int currentPlayer, int choice1, int choice2, struct gameState
     }
 
     if (DEBUG)
-        printf("Player %d reveals card number: %d\n", currentPlayer, state->hand[currentPlayer][choice1]);
+        printf("Player %d reveals card number: %d\n", currentPlayer, choice1);
 
     //increase supply count for choosen card by amount being discarded
     state->supplyCount[state->hand[currentPlayer][choice1]] += choice2;
