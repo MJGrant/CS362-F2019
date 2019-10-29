@@ -868,11 +868,13 @@ int cardAmbassador(int currentPlayer, int choice1, int choice2, struct gameState
     //step through the player's hand and see if they have enough of the card they want to get rid of
     for (int i = 0; i < state->handCount[currentPlayer]; i++)
     {
+        //if (i != handPos && state->hand[currentPlayer][i] == choice1)
         if (i != handPos && i == state->hand[currentPlayer][choice1] && i != choice1)
         {
             cardCount++;
         }
     }
+    printf("player has %d of card %d\n", cardCount, choice1);
 
     if (DEBUG)
         printf("Player %d reveals card number: %d\n", currentPlayer, choice1);
