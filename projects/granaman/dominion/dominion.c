@@ -852,7 +852,6 @@ int cardAmbassador(int currentPlayer, int choice1, int choice2, struct gameState
     //choice2 represents how many of that card the player has chosen to discard
     //cardCount will be used to see if the player actually has that many
     int cardCount = 0;
-    printf("choice1 is %d\n", choice1);
 
     //player picked too many or a negative quantity of cards to discard, this is an error state
     if (choice2 > 2 || choice2 <= 0)
@@ -907,8 +906,6 @@ int cardAmbassador(int currentPlayer, int choice1, int choice2, struct gameState
             // bug here, compare to choice1 not state->hand[currentPlayer][choice1]
             if (state->hand[currentPlayer][i] == state->hand[currentPlayer][choice1])
             {
-                printf("handCard %d matches choice1 card %d\n", state->hand[currentPlayer][i], state->hand[currentPlayer][choice1]);
-                printf("trashing a %d card\n", state->hand[currentPlayer][i]);
                 discardCard(i, currentPlayer, state, 1);
                 break;
             }
