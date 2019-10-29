@@ -37,6 +37,9 @@ unittestresults: unittest1.c unittest2.c my_asserts.o dominion.o
 	echo "unittest3.c:" >> unittestresults.out
 	gcc -o unittest3 dominion.c rngs.c unittest3.c my_asserts.c $(CFLAGS)
 	./unittest3 >> unittestresults.out
+	echo "unittest4.c:" >> unittestresults.out
+	gcc -o unittest4 dominion.c rngs.c unittest4.c my_asserts.c $(CFLAGS)
+	./unittest4 >> unittestresults.out
 	echo "coverage" >> unittestresults.out
 	gcov dominion.c -b -f >> unittestresults.out
 	cat dominion.c.gcov >> unittestresults.out
