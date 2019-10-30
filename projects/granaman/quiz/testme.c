@@ -21,26 +21,14 @@ char inputChar()
 char *inputString()
 {
     // The test ends when this happens to spell out "reset"
-    // We can make that more likely by limiting the possible character set to r, e, s, e, t
-    // e is twice as likely to appear than other letters because it appears twice in the word
 
-    char letters[5] = {'r', 'e', 's', 'e', 't'}; // one extra char to account for \0
-    char str[6];
+    char letters[10] = {'e','r','s','t','a','a','a','a','a','z'};
+    static char str[6]; // build this string out of randomly chosen letters
 
     for (int i = 0; i < 5; i++) {
-        int randomIndex = (rand()%5); // draws a random number between 0 and 4 inclusive
-        printf("Random index is: %d , corresponds to random letter: %c \n", randomIndex, letters[randomIndex]);
-        str[i] = 'a';
+        str[i] = letters[rand() %10];
     }
-    //str[0] = 'a';
-    //str[1] = 'b';
-    //str[2] = 'c';
-    //str[3] = 'd';
-    //str[4] = 'e';
-    //str[5] = 'f';
-    //str[6] = '\0';
 
-    printf("string: %s \n", str);
     return str;
 }
 
@@ -55,7 +43,7 @@ void testme()
     tcCount++;
     c = inputChar();
     s = inputString();
-    //printf("Iteration %d: c = %c, s = %s, state = %d\n", tcCount, c, s, state);
+    printf("Iteration %d: c = %c, s = %s, state = %d\n", tcCount, c, s, state);
 
     if (c == '[' && state == 0) state = 1;
     if (c == '(' && state == 1) state = 2;
