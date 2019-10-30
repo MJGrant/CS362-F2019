@@ -23,7 +23,7 @@ char *inputString()
     // The test ends when this happens to spell out "reset"
 
     char letters[10] = {'e','r','s','t','a','a','a','a','a','z'};
-    static char str[6]; // build this string out of randomly chosen letters
+    static char str[6]; // build this 5-letter string out of randomly chosen letters
 
     for (int i = 0; i < 5; i++) {
         str[i] = letters[rand() %10];
