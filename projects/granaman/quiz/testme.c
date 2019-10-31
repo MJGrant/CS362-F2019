@@ -3,8 +3,10 @@
 #include <stdlib.h>
 #include <time.h>
 
-// make clean
+// Amanda Grant (granaman) CS362 Fall 2019
+// To run:
 // make testme
+// To view coverage:
 // gcov testme.c -b
 
 char inputChar()
