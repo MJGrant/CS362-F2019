@@ -5,4 +5,4 @@ testme:
 	./testme
 
 clean:
-	rm -f testme *.gcov *.gcda *.gcno *.o
+	rm -f testme *.gcov *.gcda *.gcno *.o *.out
