@@ -5,15 +5,12 @@
 
 char inputChar()
 {
-    // My inputs include all upper- and lower-case letters, numbers, symbols such as !, ~, and @, and space. Basically,
-    // if it's on a typical North American keyboard then it's a valid char for the purposes of this quiz.
+    // The tests look for a c as low as 32 and a c as high as 125
 
-    // Those valid ASCII values are numbered 32-126
+    // This picks a random number between 0 and 93.
+    // Add +32 at the end to shift the range to 32-125
 
-    // Pick a random number between 0 and 94.
-    // Add +32 at the end to shift the range to 32-126
-
-    char randomChar = (rand() % 95) + 32;
+    char randomChar = (rand() % 94) + 32;
 
     return randomChar;
 }
