@@ -38,7 +38,7 @@ void tributeTest1() {
     cardTribute(1, &state);
 
     // assert two actions were gained
-    assertEqual("Opponent revealed 2 action cards, player gained +2 actions", numActionsBefore+2, state.numActions);
+    assertEqual("[MY BUG] Opponent revealed 2 action cards, player gained +2 actions", numActionsBefore+2, state.numActions);
 
 
     // *********************************
@@ -53,7 +53,7 @@ void tributeTest1() {
     cardTribute(1, &state);
 
     // assert two coins were gained
-    assertEqual("Opponent revealed 2 treasure cards, player gained +2 coins", coinsBefore+2, state.coins);
+    assertEqual("[MY BUG] Opponent revealed 2 treasure cards, player gained +2 coins", coinsBefore+2, state.coins);
 
     // *********************************
     // opponent's deck top 2: all victory cards
@@ -68,7 +68,7 @@ void tributeTest1() {
     cardTribute(1, &state);
 
     // assert two cards were drawn from player's own deck
-    assertEqual("Opponent revealed 2 victory cards, player drew +2 cards from their own deck", deckCountBefore+2, state.deckCount[currentPlayer]);
+    assertEqual("[MY BUG]  Opponent revealed 2 victory cards, player drew +2 cards from their own deck", deckCountBefore+2, state.deckCount[currentPlayer]);
     assertEqual("Player's deck decreased in size by 2", deckCountBefore-2, state.deckCount[currentPlayer]);
     assertEqual("Player's hand size increased by 2", handCountBefore+2, state.handCount[currentPlayer]);
 
@@ -211,6 +211,25 @@ void tributeTest1() {
 
     // the revealed cards should be moved to the opponent's discard pile
     assertEqual("Opponent's discard pile size increased by 2", opponentDiscardCountBefore+2, state.discardCount[opponent]);
+
+    // *********************************
+    // [MY BUG] opponent's deck top 2: gardens card test
+    state.deckCount[opponent] = 2;
+    state.deck[opponent][0] = ambassador;
+    state.deck[opponent][1] = gardens;
+
+    numActionsBefore = state.numActions;
+    deckCountBefore = state.deckCount[currentPlayer];
+    handCountBefore = state.handCount[currentPlayer];
+
+    // act
+    cardTribute(1, &state);
+
+    // assert two actions were gained and two coins were gained
+    assertEqual("Opponent revealed 1 action card, player gained +2 actions", numActionsBefore+2, state.numActions);
+    assertEqual("[MY BUG] Opponent revealed 1 victory card [gardens], player drew +2 cards to their own deck", deckCountBefore+2, state.deckCount[currentPlayer]);
+    assertEqual("Player's deck decreased in size by 2", deckCountBefore-2, state.deckCount[currentPlayer]);
+    assertEqual("Player's hand size increased by 2", handCountBefore+2, state.handCount[currentPlayer]);
 }
 
 void tributeTest2() {
@@ -389,7 +408,6 @@ void tributeTest3() {
     handCountBefore = state.handCount[currentPlayer];
 
     int opponentDiscardCountBefore = state.discardCount[opponent];
-
 
     // act
     cardTribute(1, &state);

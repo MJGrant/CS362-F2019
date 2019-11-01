@@ -103,7 +103,13 @@ void mineTest1() {
     state.hand[currentPlayer][3] = gold;
 
     ret = cardMine(currentPlayer, 3, gold, &state, 0);
-    assertEqual("[EXISTING BUG] Player is allowed to make a lateral trade (gold for gold)", ret, 0);
+    assertEqual("[MY BUG] Player is allowed to make a lateral trade (gold for gold)", ret, 0);
+
+    ret = cardMine(currentPlayer, 2, silver, &state, 0);
+    assertEqual("[Player is allowed to make a lateral trade (silver for silver)", ret, 0);
+
+    ret = cardMine(currentPlayer, 1, copper, &state, 0);
+    assertEqual("[layer is allowed to make a lateral trade (copper for copper)", ret, 0);
 
     // arrange
     state.handCount[currentPlayer] = 4;
@@ -113,7 +119,10 @@ void mineTest1() {
     state.hand[currentPlayer][3] = gold;
 
     ret = cardMine(currentPlayer, 3, silver, &state, 0);
-    assertEqual("[EXISTING BUG] Player is allowed to trade down (gold for a silver)", ret, 0);
+    assertEqual("[MY BUG] Player is allowed to trade down (gold for a silver)", ret, 0);
+
+    ret = cardMine(currentPlayer, 3, silver, &state, 0);
+    assertEqual("[EXISTING BUG] Player is allowed to trade down (silver for a copper)", ret, 0);
 
 }
 
@@ -170,11 +179,11 @@ void mineTest2() {
 
     int negativeCard = -1;
     ret = cardMine(currentPlayer, 1, negativeCard, &state, 0);
-    assertEqual("Player is prevented from trading a copper for a card that does not exist (low)", ret, -1);
+    assertEqual("Player is prevented from trading a copper for a card that does not exist (low end)", ret, -1);
 
-    int outOfBoundsCard = 100;
+    int outOfBoundsCard = 27;
     ret = cardMine(currentPlayer, 1, outOfBoundsCard, &state, 0);
-    assertEqual("Player is prevented from trading a copper for a card that does not exist (high)", ret, -1);
+    assertEqual("Player is prevented from trading a copper for a card that does not exist (high end)", ret, -1);
 }
 
 int main() {
