@@ -82,6 +82,13 @@ void ambassadorTest1() {
     // assert
     assertEqual("Attempting to discard 3 copies of a card is rejected", ret, -1);
 
+    // act
+    // player attempts to discard zero cards
+    ret = cardAmbassador(currentPlayer, estate, 0, &state, 0);
+
+    // assert
+    assertEqual("[MY BUG] Attempting to discard 0 copies of a card is allowed", ret, 0);
+
     //arrange
     state.handCount[currentPlayer] = 4;
     state.hand[currentPlayer][0] = ambassador;
@@ -96,12 +103,12 @@ void ambassadorTest1() {
     // assert
     // BUG: the game lets this happen, it "generates" copies of the card the player is attempting to discard
     // if the player is trying to discard more than they actually own
-    assertEqual("[EXISTING BUG] Attempting to discard 2 copies of a card the player only has 1 of is rejected", ret, -1);
+    assertEqual("[MY BUG] Attempting to discard 2 copies of a card the player only has 1 of is rejected", ret, -1);
 
     //assert
     // test that the code returns an error when the player selects a card not in their hand? (UI may not allow it)
     ret = cardAmbassador(currentPlayer, silver, 2, &state, 0);
-    assertEqual("[EXISTING BUG] Attempting to discard a card the player doesn't have is rejected", ret, -1);
+    assertEqual("[MY BUG] Attempting to discard a card the player doesn't have is rejected", ret, -1);
 
 
 }
