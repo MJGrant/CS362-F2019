@@ -89,13 +89,46 @@ void randomTestCard1() {
 
         setRandomEstateQuantity(&state);
 
-        printf("Baron Random Test [Option 1: Discard estate for +4 coins] - Iteration %d, hand count: %d, estate supply pile: %d \n", iteration, randomHandCount, state.supplyCount[estate]);
+        int handCountBefore = state.handCount[currentPlayer];
+        int estateSupplyCountBefore = state.supplyCount[estate];
+        int discardCountBefore = state.discardCount[currentPlayer];
+        int topOfDiscardPileBefore = state.discard[currentPlayer][state.discardCount[currentPlayer]-1];
 
-        // act - choice1 is 1; the player wants to discard an estate they have
+        int estateHandCountBefore = 0;
+        for (int i = 0; i < state.handCount[currentPlayer]; i++) {
+            if (state.hand[currentPlayer][i] == estate) {
+                estateHandCountBefore++;
+            }
+        }
+
         int coinsBefore = state.coins;
+
+        printf("Baron Random Test [Option 1: Discard an estate card for +4 coins\nIteration #%d, hand count: %d, discard count: %d, estate supply pile: %d, estates in hand: %d \n", iteration, randomHandCount, discardCountBefore, estateSupplyCountBefore, estateHandCountBefore);
+
+        // act - choice1 is 1, trade an estate (from hand) for +4 coins
         cardBaron(currentPlayer, 1, &state);
-        if (state.coins == coinsBefore + 4) {
-            printf("coins ok!\n");
+
+        if (estateHandCountBefore > 0) {
+            // if the player actually has an estate card in hand to discard...
+            assertEqual("Player gained +4 coins", coinsBefore+4, state.coins);
+            assertIncreasedByOne("Player gained a card in their discard pile", discardCountBefore, state.discardCount[currentPlayer]);
+            assertEqual("The top card in the discard pile is an estate", estate, state.discard[currentPlayer][state.discardCount[currentPlayer]-1]);
+            assertDecreasedByOne("Hand count was reduced by one", handCountBefore, state.handCount[currentPlayer]);
+        } else if (estateHandCountBefore == 0) {
+            // if the player didn't have any estates in their hand, they should've attempted to draw one instead
+            if (estateSupplyCountBefore > 0) {
+                // if the supply pile had at least one estate to draw, confirm that it was successfully drawn
+                assertEqual("The player's hand remains the same", handCountBefore, state.handCount[currentPlayer]);
+                assertIncreasedByOne("Player gained a card in their discard pile", discardCountBefore, state.discardCount[currentPlayer]);
+                assertEqual("The top card in the discard pile is an estate", estate, state.discard[currentPlayer][state.discardCount[currentPlayer]-1]);
+            } else if (estateSupplyCountBefore == 0) {
+                // but if the supply pile didn't have any, either, then the player should gain no coins
+                // and draw no cards
+                assertEqual("The player's hand remains the same", handCountBefore, state.handCount[currentPlayer]);
+                assertEqual("Player's discard pile count is unchanged", discardCountBefore, state.discardCount[currentPlayer]);
+                assertEqual("Top card of player's discard pile is unchanged", topOfDiscardPileBefore, state.discard[currentPlayer][state.discardCount[currentPlayer]-1]);
+                assertEqual("Estate pile remains at zero", state.supplyCount[estate], 0);
+            }
         }
 
         if (iteration == MAX_ITERATIONS) {
@@ -145,28 +178,28 @@ void randomTestCard2() {
         setRandomEstateQuantity(&state);
 
         int handCountBefore = state.handCount[currentPlayer];
-        int estateCountBefore = state.supplyCount[estate];
+        int estateSupplyCountBefore = state.supplyCount[estate];
         int discardCountBefore = state.discardCount[currentPlayer];
         int topOfDiscardPileBefore = state.discard[currentPlayer][state.discardCount[currentPlayer]-1];
         printf("topOfDiscardPileBefore: %d\n", topOfDiscardPileBefore);
 
-        printf("Baron Random Test [Option 2: Draw an estate card]\nIteration #%d, hand count: %d, discard count: %d, estate supply pile: %d \n", iteration, randomHandCount, discardCountBefore, estateCountBefore);
+        printf("Baron Random Test [Option 2: Draw an estate card]\nIteration #%d, hand count: %d, discard count: %d, estate supply pile: %d \n", iteration, randomHandCount, discardCountBefore, estateSupplyCountBefore);
 
         // act - choice1 is 0, take an estate (if one exists in the supply)
         cardBaron(currentPlayer, 0, &state);
 
         assertEqual("The player's hand remains the same", handCountBefore, state.handCount[currentPlayer]);
 
-        if (estateCountBefore == 0) {
+        if (estateSupplyCountBefore > 0) {
             // if the supply count for estates happened to be 0, test that the
             // player didn't gain anything
+            assertIncreasedByOne("Player gained a card in their discard pile", discardCountBefore, state.discardCount[currentPlayer]);
+            assertEqual("The top card in the discard pile is an estate", estate, state.discard[currentPlayer][state.discardCount[currentPlayer]-1]);
+            assertDecreasedByOne("Estate pile was reduced by one", estateSupplyCountBefore, state.supplyCount[estate]);
+        } else if (estateSupplyCountBefore == 0) {
             assertEqual("Player's discard pile count is unchanged", discardCountBefore, state.discardCount[currentPlayer]);
             assertEqual("Top card of player's discard pile is unchanged", topOfDiscardPileBefore, state.discard[currentPlayer][state.discardCount[currentPlayer]-1]);
             assertEqual("Estate pile remains at zero", state.supplyCount[estate], 0);
-        } else {
-            assertIncreasedByOne("Player gained a card in their discard pile", discardCountBefore, state.discardCount[currentPlayer]);
-            assertEqual("The top card in the discard pile is an estate", estate, state.discard[currentPlayer][state.discardCount[currentPlayer]-1]);
-            assertDecreasedByOne("Estate pile was reduced by one", estateCountBefore, state.supplyCount[estate]);
         }
 
         if (iteration == MAX_ITERATIONS) {
@@ -179,7 +212,7 @@ void randomTestCard2() {
 
 int main() {
     srand(time(NULL));
-    //randomTestCard1();
+    randomTestCard1();
     randomTestCard2();
     return 0;
 }
