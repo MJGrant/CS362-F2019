@@ -14,7 +14,7 @@
 // choice1 is 0 = gain an estate (if there are any available)
 // choice1 is 1 = discard an estate for +4 coins or gain an estate if you don't have one
 
-void randomTestCard1() {
+void randomTestCard1a() {
 
     // arrange
     struct gameState state;
@@ -104,7 +104,7 @@ void randomTestCard1() {
     }
 }
 
-void randomTestCard2() {
+void randomTestCard1b() {
 
     // arrange
     struct gameState state;
@@ -177,7 +177,7 @@ void randomTestCard2() {
 
 int main() {
     srand(time(NULL));
-    randomTestCard1();
-    randomTestCard2();
+    randomTestCard1a();
+    randomTestCard1b();
     return 0;
 }
