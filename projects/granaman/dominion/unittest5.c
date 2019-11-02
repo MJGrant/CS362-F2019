@@ -87,7 +87,7 @@ void mineTest1() {
 
     // verify the silver was removed from the player's hand
     // verify a gold was added to the player's hand
-    int silverCount = 0;
+    silverCount = 0;
     int goldCount = 0;
     for (int i = 0; i < state.handCount[currentPlayer]; i++) {
         if (state.hand[currentPlayer][i] == silver) {
