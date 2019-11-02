@@ -63,13 +63,13 @@ void randomTestCard1() {
     // (choice1 = 1)
 
     // Preconditions:
-    // randomize the size of the player's hand
-    // randomize the cards in the player's hand
+    // randomize the size, cards of the player's hand
+    // randomize the size, cards of the player's discard pile
     // randomize the quantity of estates in the estate pile
 
     // Postconditions:
     // Choice 1 is 1: the player gains +4 coins and discards an estate, or if the
-    // player had no estates, the player gains one instead
+    // player had no estates, the player gains one instead (if there are any in the supply)
 
     // cardBaron only returns 0, never -1
     // must test "failure" states some other way
@@ -103,7 +103,7 @@ void randomTestCard1() {
 
         int coinsBefore = state.coins;
 
-        printf("Baron Random Test [Option 1: Discard an estate card for +4 coins\nIteration #%d, hand count: %d, discard count: %d, estate supply pile: %d, estates in hand: %d \n", iteration, randomHandCount, discardCountBefore, estateSupplyCountBefore, estateHandCountBefore);
+        printf("Baron Random Test [Option 1: Discard an estate card for +4 coins]\nIteration #%d, hand count: %d, discard count: %d, estate supply pile: %d, estates in hand: %d \n", iteration, randomHandCount, discardCountBefore, estateSupplyCountBefore, estateHandCountBefore);
 
         // act - choice1 is 1, trade an estate (from hand) for +4 coins
         cardBaron(currentPlayer, 1, &state);
@@ -133,7 +133,7 @@ void randomTestCard1() {
 
         if (iteration == MAX_ITERATIONS) {
             printf("Done with %d iterations\n", MAX_ITERATIONS);
-            exit(200);
+            break;
         }
     }
 }
@@ -181,7 +181,6 @@ void randomTestCard2() {
         int estateSupplyCountBefore = state.supplyCount[estate];
         int discardCountBefore = state.discardCount[currentPlayer];
         int topOfDiscardPileBefore = state.discard[currentPlayer][state.discardCount[currentPlayer]-1];
-        printf("topOfDiscardPileBefore: %d\n", topOfDiscardPileBefore);
 
         printf("Baron Random Test [Option 2: Draw an estate card]\nIteration #%d, hand count: %d, discard count: %d, estate supply pile: %d \n", iteration, randomHandCount, discardCountBefore, estateSupplyCountBefore);
 
@@ -204,7 +203,7 @@ void randomTestCard2() {
 
         if (iteration == MAX_ITERATIONS) {
             printf("Done with %d iterations\n", MAX_ITERATIONS);
-            exit(200);
+            break;
         }
     }
 }
