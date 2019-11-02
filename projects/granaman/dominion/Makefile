@@ -6,6 +6,9 @@ rngs.o: rngs.h rngs.c
 my_asserts.o: my_asserts.h my_asserts.c
 	gcc -c my_asserts.c -g  $(CFLAGS)
 
+my_utils.o: my_utils.h my_utils.c
+	gcc -c my_utils.c -g  $(CFLAGS)
+
 dominion.o: dominion.h dominion.c rngs.o
 	gcc -c dominion.c -g  $(CFLAGS)
 
@@ -24,9 +27,9 @@ runtests: testDrawCard
 	gcov dominion.c >> unittestresult.out
 	cat dominion.c.gcov >> unittestresult.out
 
-randomtestresults: randomtestcard1.c randomtestcard2.c randomtestcard3.c my_asserts.o dominion.o
+randomtestresults: randomtestcard1.c randomtestcard2.c randomtestcard3.c my_asserts.o my_utils.o dominion.o
 	echo "randomtestcard1.c:" > randomtestresults.out
-	gcc -o randomtestcard1 dominion.c rngs.c randomtestcard1.c my_asserts.c $(CFLAGS)
+	gcc -o randomtestcard1 dominion.c rngs.c randomtestcard1.c my_asserts.c my_utils.c $(CFLAGS)
 	./randomtestcard1 >> randomtestresults.out
 	echo "coverage" >> randomtestresults.out
 	gcov dominion.c -b -f >> randomtestresults.out

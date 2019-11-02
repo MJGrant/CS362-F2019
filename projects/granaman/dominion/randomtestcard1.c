@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "my_asserts.h"
+#include "my_utils.h"
 #include "dominion.h"
 #include <time.h>
 
@@ -12,41 +13,6 @@
 // cardBaron params: numPlayer, choice1, state
 // choice1 is 0 = gain an estate (if there are any available)
 // choice1 is 1 = discard an estate for +4 coins or gain an estate if you don't have one
-
-int MAX_ITERATIONS = 100;
-int MAX_HAND_SIZE = 10; // up to 500 is allowed but realistically the player's hand size is rarely over 10
-
-int getRandomHandCount() {
-    int random = rand() % MAX_HAND_SIZE; // between 0 and max hand size
-    return random;
-}
-
-int getRandomDiscardCount() {
-    int random = rand() % MAX_DECK; // between 0 and 500 as defined in dominion.h
-    return random;
-}
-
-int getRandomCard() {
-    int card = rand() % 27; // between 0 and 26
-    return card;
-}
-
-
-void setRandomHand(struct gameState *state, int currentPlayer, int randomHandCount) {
-    for (int i = 0; i < randomHandCount; i++) {
-        state->hand[currentPlayer][i] = getRandomCard();
-    }
-}
-
-void setRandomDiscardPile(struct gameState *state, int currentPlayer, int randomDiscardCount) {
-    for (int i = 0; i < randomDiscardCount; i++) {
-        state->discard[currentPlayer][i] = getRandomCard();
-    }
-}
-
-void setRandomEstateQuantity(struct gameState *state) {
-    state->supplyCount[estate] = rand() % 9; //random number of estates between 0 and 8
-}
 
 void randomTestCard1() {
 
