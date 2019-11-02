@@ -19,11 +19,11 @@ enum CARD
 {   curse = 0,
     estate,
     duchy,
-    province,
+    province, // 3
 
     copper,
     silver,
-    gold,
+    gold, // 6
 
     adventurer,
     /* If no/only 1 treasure found, stop when full deck seen */
@@ -34,7 +34,7 @@ enum CARD
 	    money to put in hand */
     remodel, /* choice1 is hand# of card to remodel, choice2 is supply# */
     smithy,
-    village,
+    village, // 14
 
     baron, /* choice1: boolean for discard of estate */
     /* Discard is always of first (lowest index) estate */

@@ -800,7 +800,7 @@ int cardMine(int currentPlayer, int choice1, int choice2, struct gameState *stat
 
     // if the value of the card the player is trashing + 3 is greater than or equal to the cost of the
     // card the player wants to get, let the trade happen
-    if ((getCost(state->hand[currentPlayer][choice1]) + 3 >= getCost(choice2))
+    if (getCost(state->hand[currentPlayer][choice1]) + 3 >= getCost(choice2))
     {
       //let the trade happen
       gainCard(choice2, state, 1, currentPlayer);
