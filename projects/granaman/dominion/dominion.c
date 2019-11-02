@@ -868,7 +868,7 @@ int cardAmbassador(int currentPlayer, int choice1, int choice2, struct gameState
     //step through the player's hand and see if they have enough of the card they want to get rid of
     for (int i = 0; i < state->handCount[currentPlayer]; i++)
     {
-        //if (i != handPos && state->hand[currentPlayer][i] == choice1)
+        //may need to remove second part of this statement, it's checking if i is equal to the content of [choice1]
         if (i != handPos && i == state->hand[currentPlayer][choice1] && i != choice1)
         {
             cardCount++;
@@ -879,8 +879,6 @@ int cardAmbassador(int currentPlayer, int choice1, int choice2, struct gameState
         printf("Player %d reveals card number: %d\n", currentPlayer, choice1);
 
     //increase supply count for choosen card by amount being discarded
-    //bug: this should be
-    //state->supplyCount[choice1] += choice2;
     state->supplyCount[state->hand[currentPlayer][choice1]] += choice2;
 
     // Each other player gains a copy of revealed card
@@ -892,10 +890,7 @@ int cardAmbassador(int currentPlayer, int choice1, int choice2, struct gameState
     {
         if (i != currentPlayer && cardCount > 0)
         {
-            // bug: this should use choice1 by itself, not as an array index
-            //gainCard(choice1, state, 0, i);
             gainCard(state->hand[currentPlayer][choice1], state, 0, i);
-
             cardCount--;
         }
     }
@@ -909,7 +904,6 @@ int cardAmbassador(int currentPlayer, int choice1, int choice2, struct gameState
     {
         for (int i = 0; i < state->handCount[currentPlayer]; i++)
         {
-            // bug here, compare to choice1 not state->hand[currentPlayer][choice1]
             if (state->hand[currentPlayer][i] == state->hand[currentPlayer][choice1])
             {
                 discardCard(i, currentPlayer, state, 1);

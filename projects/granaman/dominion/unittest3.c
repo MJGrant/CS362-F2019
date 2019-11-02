@@ -43,7 +43,7 @@ void ambassadorTest1() {
     // set choice1 (second param) to estate to indicate which card to reveal
     // set choice2 (param after that) to indicate how many
     // the last param is the position of the ambassador card itself in the player's hand
-    ret = cardAmbassador(currentPlayer, estate, 2, &state, 0);
+    ret = cardAmbassador(currentPlayer, 2, 2, &state, 0);
 
     // assert
     int ambassadorHandCount = 0;
@@ -62,7 +62,7 @@ void ambassadorTest1() {
     assertEqual("[EXISTING BUG] Ambassador card added to player's discard pile", state.discard[currentPlayer][state.discardCount[currentPlayer]-1], estate);
     // this fails because the trash loop at the end of cardAmbassador should compare to choice1 not state->hand[currentPlayer][choice1]
     assertEqual("[EXISTING BUG] The player no longer has any estate cards in their hand", estateHandCount, 0);
-    assertIncreasedByOne("[EXISTING BUG] The Estate supply pile has grown +1 in size", estateSupplyBefore, state.supplyCount[estate]);
+    assertIncreasedByOne("The Estate supply pile has grown +1 in size", estateSupplyBefore, state.supplyCount[estate]);
     assertIncreasedByOne("[EXISTING BUG] The opponent hand size has increased by one", opponentHandSizeBefore, state.handCount[0]);
     assertEqual("[EXISTING BUG] The opponent's hand has gained an Estate card", state.hand[0][state.handCount[0]], estate);
 
@@ -70,21 +70,21 @@ void ambassadorTest1() {
 
     // act
     // set choice1 and handpos to the same number (the ambassador card itself is at 0)
-    ret = cardAmbassador(currentPlayer, ambassador, 1, &state, 0);
+    ret = cardAmbassador(currentPlayer, 0, 1, &state, 0);
 
     // assert
-    assertEqual("[EXISTING BUG] Attempting to discard the Ambassador card itself is rejected", ret, -1);
+    assertEqual("Attempting to discard the Ambassador card itself is rejected", ret, -1);
 
     // act
     // player attempts to discard more than the allowed number of cards
-    ret = cardAmbassador(currentPlayer, estate, 3, &state, 0);
+    ret = cardAmbassador(currentPlayer, 2, 3, &state, 0);
 
     // assert
     assertEqual("Attempting to discard 3 copies of a card is rejected", ret, -1);
 
     // act
     // player attempts to discard zero cards
-    ret = cardAmbassador(currentPlayer, estate, 0, &state, 0);
+    ret = cardAmbassador(currentPlayer, 2, 0, &state, 0);
 
     // assert
     assertEqual("[MY BUG] Attempting to discard 0 copies of a card is allowed", ret, 0);
@@ -98,7 +98,7 @@ void ambassadorTest1() {
 
     // act
     // player attempts to discard estate, but specifies 2 when the player only has 1 estate to give
-    ret = cardAmbassador(currentPlayer, estate, 2, &state, 0);
+    ret = cardAmbassador(currentPlayer, 2, 2, &state, 0);
 
     // assert
     // BUG: the game lets this happen, it "generates" copies of the card the player is attempting to discard
@@ -107,7 +107,7 @@ void ambassadorTest1() {
 
     //assert
     // test that the code returns an error when the player selects a card not in their hand? (UI may not allow it)
-    ret = cardAmbassador(currentPlayer, silver, 2, &state, 0);
+    ret = cardAmbassador(currentPlayer, 3, 2, &state, 0);
     assertEqual("[MY BUG] Attempting to discard a card the player doesn't have is rejected", ret, -1);
 
 
