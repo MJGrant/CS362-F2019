@@ -3,6 +3,9 @@ CFLAGS= -Wall -fpic -coverage -lm -std=c99
 rngs.o: rngs.h rngs.c
 	gcc -c rngs.c -g  $(CFLAGS)
 
+my_asserts.o: my_asserts.h my_asserts.c
+	gcc -c my_asserts.c -g  $(CFLAGS)
+
 dominion.o: dominion.h dominion.c rngs.o
 	gcc -c dominion.c -g  $(CFLAGS)
 
@@ -21,9 +24,9 @@ runtests: testDrawCard
 	gcov dominion.c >> unittestresult.out
 	cat dominion.c.gcov >> unittestresult.out
 
-randomtestresults: randomtestcard1.c randomtestcard2.c randomtestcard3.c dominion.o
+randomtestresults: randomtestcard1.c randomtestcard2.c randomtestcard3.c my_asserts.o dominion.o
 	echo "randomtestcard1.c:" > randomtestresults.out
-	gcc -o randomtestcard1 dominion.c rngs.c randomtestcard1.c $(CFLAGS)
+	gcc -o randomtestcard1 dominion.c rngs.c randomtestcard1.c my_asserts.c $(CFLAGS)
 	./randomtestcard1 >> randomtestresults.out
 
 player: player.c interface.o
