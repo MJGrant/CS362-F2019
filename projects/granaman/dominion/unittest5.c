@@ -48,14 +48,20 @@ void mineTest1() {
     assertEqual("Player is allowed to trade a copper for a silver", ret, 0);
 
     // verify the copper was removed from the player's hand
+    // verify that a silver was added
     int copperCount = 0;
+    int silverCount = 0;
     for (int i = 0; i < state.handCount[currentPlayer]; i++) {
         if (state.hand[currentPlayer][i] == copper) {
             copperCount++;
         }
+        if (state.hand[currentPlayer][i] == silver) {
+            silverCount++;
+        }
     }
 
     assertEqual("Player's hand no longer contains the copper card that was traded", copperCount, 0);
+    assertEqual("Player's hand now contains the silver card that was gained", silverCount, 1);
 
     // verify the silver was added to the player's deck
     assertIncreasedByOne("[MY BUG] Player's hand count stays the same", handCountBefore, state.handCount[currentPlayer]);
@@ -80,14 +86,20 @@ void mineTest1() {
     assertEqual("Player is allowed to trade a silver for a gold", ret, 0);
 
     // verify the silver was removed from the player's hand
+    // verify a gold was added to the player's hand
     int silverCount = 0;
+    int goldCount = 0;
     for (int i = 0; i < state.handCount[currentPlayer]; i++) {
         if (state.hand[currentPlayer][i] == silver) {
             silverCount++;
         }
+        if (state.hand[currentPlayer][i] == gold) {
+            goldCount++;
+        }
     }
 
     assertEqual("Player's hand no longer contains the silver card that was traded", silverCount, 0);
+    assertEqual("Player's hand now contains the gold card that was gained", goldCount, 1);
 
     // verify the silver was added to the player's deck
     assertIncreasedByOne("[MY BUG] Player's hand count stays the same", handCountBefore, state.handCount[currentPlayer]);
@@ -102,14 +114,44 @@ void mineTest1() {
     state.hand[currentPlayer][2] = silver;
     state.hand[currentPlayer][3] = gold;
 
+    // lateral trade - gold
     ret = cardMine(currentPlayer, 3, gold, &state, 0);
     assertEqual("[MY BUG] Player is allowed to make a lateral trade (gold for gold)", ret, 0);
 
+    goldCount = 0;
+    for (int i = 0; i < state.handCount[currentPlayer]; i++) {
+        if (state.hand[currentPlayer][i] == gold) {
+            goldCount++;
+        }
+    }
+
+    assertEqual("Player's hand still contains a gold card", goldCount, 1);
+
+    // lateral trade - silver
     ret = cardMine(currentPlayer, 2, silver, &state, 0);
     assertEqual("[Player is allowed to make a lateral trade (silver for silver)", ret, 0);
 
+    silverCount = 0;
+    for (int i = 0; i < state.handCount[currentPlayer]; i++) {
+        if (state.hand[currentPlayer][i] == silver) {
+            silverCount++;
+        }
+    }
+
+    assertEqual("Player's hand still contains a silver card", silverCount, 1);
+
+    // lateral trade - copper
     ret = cardMine(currentPlayer, 1, copper, &state, 0);
     assertEqual("[layer is allowed to make a lateral trade (copper for copper)", ret, 0);
+
+    copperCount = 0;
+    for (int i = 0; i < state.handCount[currentPlayer]; i++) {
+        if (state.hand[currentPlayer][i] == copper) {
+            copperCount++;
+        }
+    }
+
+    assertEqual("Player's hand still contains a copper card", copperCount, 1);
 
     // arrange
     state.handCount[currentPlayer] = 4;
@@ -118,11 +160,31 @@ void mineTest1() {
     state.hand[currentPlayer][2] = silver;
     state.hand[currentPlayer][3] = gold;
 
+    // downgrade trade - gold to silver
     ret = cardMine(currentPlayer, 3, silver, &state, 0);
     assertEqual("[MY BUG] Player is allowed to trade down (gold for a silver)", ret, 0);
 
+    silverCount = 0;
+    for (int i = 0; i < state.handCount[currentPlayer]; i++) {
+        if (state.hand[currentPlayer][i] == silver) {
+            silverCount++;
+        }
+    }
+
+    assertEqual("Player's hand now contains a silver card", silverCount, 1);
+
+    // downgrade trade - silver to copper
     ret = cardMine(currentPlayer, 3, silver, &state, 0);
     assertEqual("[EXISTING BUG] Player is allowed to trade down (silver for a copper)", ret, 0);
+
+    copperCount = 0;
+    for (int i = 0; i < state.handCount[currentPlayer]; i++) {
+        if (state.hand[currentPlayer][i] == copper) {
+            copperCount++;
+        }
+    }
+
+    assertEqual("Player's hand now contains a copper card", copperCount, 1);
 
 }
 
