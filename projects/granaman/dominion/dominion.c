@@ -712,6 +712,8 @@ int cardBaron(int currentPlayer, int choice1, struct gameState *state)
                         isGameOver(state);
                     }
                 }
+                // we've checked all the player's cards, no estate found
+                card_not_discarded = 0; // exit the loop
             }
 
             else {
