@@ -21,6 +21,11 @@ int getRandomHandCount() {
     return random;
 }
 
+int getRandomDiscardCount() {
+    int random = rand() % MAX_DECK; // between 0 and 500 as defined in dominion.h
+    return random;
+}
+
 int getRandomCard() {
     int card = rand() % 27; // between 0 and 26
     return card;
@@ -29,7 +34,13 @@ int getRandomCard() {
 
 void setRandomHand(struct gameState *state, int currentPlayer, int randomHandCount) {
     for (int i = 0; i < randomHandCount; i++) {
-        state->hand[currentPlayer][i] = getRandomCard;
+        state->hand[currentPlayer][i] = getRandomCard();
+    }
+}
+
+void setRandomDiscardPile(struct gameState *state, int currentPlayer, int randomDiscardCount) {
+    for (int i = 0; i < randomDiscardCount; i++) {
+        state->discard[currentPlayer][i] = getRandomCard();
     }
 }
 
@@ -66,10 +77,16 @@ void randomTestCard1() {
     while(1) {
         iteration++;
 
+        // randomize hand size and cards
         int randomHandCount = getRandomHandCount();
-
         state.handCount[currentPlayer] = randomHandCount;
         setRandomHand(&state, currentPlayer, randomHandCount);
+
+        // randomize discard pile size and cards
+        int randomDiscardCount = getRandomDiscardCount();
+        state.discardCount[currentPlayer] = randomDiscardCount;
+        setRandomDiscardPile(&state, currentPlayer, randomDiscardCount);
+
         setRandomEstateQuantity(&state);
 
         printf("Baron Random Test [Option 1: Discard estate for +4 coins] - Iteration %d, hand count: %d, estate supply pile: %d \n", iteration, randomHandCount, state.supplyCount[estate]);
@@ -114,28 +131,42 @@ void randomTestCard2() {
 
     while(1) {
         iteration++;
-        int randomHandCount = getRandomHandCount();
 
+        // randomize hand size and cards
+        int randomHandCount = getRandomHandCount();
         state.handCount[currentPlayer] = randomHandCount;
         setRandomHand(&state, currentPlayer, randomHandCount);
+
+        // randomize discard pile size and cards
+        int randomDiscardCount = getRandomDiscardCount();
+        state.discardCount[currentPlayer] = randomDiscardCount;
+        setRandomDiscardPile(&state, currentPlayer, randomDiscardCount);
+
         setRandomEstateQuantity(&state);
 
         int handCountBefore = state.handCount[currentPlayer];
         int estateCountBefore = state.supplyCount[estate];
         int discardCountBefore = state.discardCount[currentPlayer];
+        int topOfDiscardPileBefore = state.discard[currentPlayer][state.discardCount[currentPlayer]-1];
+        printf("topOfDiscardPileBefore: %d\n", topOfDiscardPileBefore);
 
-        printf("Baron Random Test [Option 2: Gain an estate] - Iteration %d, hand count: %d, estate supply pile: %d \n", iteration, randomHandCount, state.supplyCount[estate]);
+        printf("Baron Random Test [Option 2: Draw an estate card]\nIteration #%d, hand count: %d, discard count: %d, estate supply pile: %d \n", iteration, randomHandCount, discardCountBefore, estateCountBefore);
 
         // act - choice1 is 0, take an estate (if one exists in the supply)
         cardBaron(currentPlayer, 0, &state);
 
+        assertEqual("The player's hand remains the same", handCountBefore, state.handCount[currentPlayer]);
+
         if (estateCountBefore == 0) {
             // if the supply count for estates happened to be 0, test that the
             // player didn't gain anything
-            assertEqual("Player is unable to draw from empty estate pile", handCountBefore, state.handCount[currentPlayer]);
+            assertEqual("Player's discard pile count is unchanged", discardCountBefore, state.discardCount[currentPlayer]);
+            assertEqual("Top card of player's discard pile is unchanged", topOfDiscardPileBefore, state.discard[currentPlayer][state.discardCount[currentPlayer]-1]);
+            assertEqual("Estate pile remains at zero", state.supplyCount[estate], 0);
         } else {
             assertIncreasedByOne("Player gained a card in their discard pile", discardCountBefore, state.discardCount[currentPlayer]);
             assertEqual("The top card in the discard pile is an estate", estate, state.discard[currentPlayer][state.discardCount[currentPlayer]-1]);
+            assertDecreasedByOne("Estate pile was reduced by one", estateCountBefore, state.supplyCount[estate]);
         }
 
         if (iteration == MAX_ITERATIONS) {
