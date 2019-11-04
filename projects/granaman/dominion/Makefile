@@ -31,6 +31,9 @@ randomtestresults: randomtestcard1.c randomtestcard2.c randomtestcard3.c my_asse
 	echo "randomtestcard1.c:" > randomtestresults.out
 	gcc -o randomtestcard1 dominion.c rngs.c randomtestcard1.c my_asserts.c my_utils.c $(CFLAGS)
 	./randomtestcard1 >> randomtestresults.out
+	echo "randomtestcard2.c:" >> randomtestresults.out
+	gcc -o randomtestcard2 dominion.c rngs.c randomtestcard2.c my_asserts.c my_utils.c $(CFLAGS)
+	./randomtestcard2 >> randomtestresults.out
 	echo "coverage" >> randomtestresults.out
 	gcov dominion.c -b -f >> randomtestresults.out
 	cat dominion.c.gcov >> randomtestresults.out
