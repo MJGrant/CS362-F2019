@@ -48,6 +48,12 @@ void randomTestCard1a() {
         state.handCount[currentPlayer] = randomHandCount;
         setRandomHand(&state, currentPlayer, randomHandCount);
 
+        // randomize the position of the baron card in the player's hand
+        if (randomHandCount > 0) {
+            int randomHandPos = rand() % randomHandCount;
+            state.hand[currentPlayer][randomHandPos] = baron;
+        }
+
         // randomize discard pile size and cards
         int randomDiscardCount = getRandomDiscardCount();
         state.discardCount[currentPlayer] = randomDiscardCount;
@@ -135,6 +141,12 @@ void randomTestCard1b() {
         int randomHandCount = getRandomHandCount();
         state.handCount[currentPlayer] = randomHandCount;
         setRandomHand(&state, currentPlayer, randomHandCount);
+
+        // randomize the position of the baron card in the player's hand
+        if (randomHandCount > 0) {
+            int randomHandPos = rand() % randomHandCount;
+            state.hand[currentPlayer][randomHandPos] = baron;
+        }
 
         // randomize discard pile size and cards
         int randomDiscardCount = getRandomDiscardCount();
