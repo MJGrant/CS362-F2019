@@ -24,34 +24,23 @@ void randomTestCard2() {
         struct gameState state;
         int k[10] = {1,2,3,4,5,6,7,8,9,10};
         int currentPlayer = 1;
-        int numPlayers = rand() % 2 + 2; // random between 0-2, then shift to 2-4
+        int numPlayers = getRandomNumberOfPlayers();
 
         initializeGame(numPlayers, k, 2, &state);
 
         state.coins = rand() % 101; // starting coins between 0 and 100
         int choice = rand() % 2+1; // random between 0-1, shifted to 1-2
 
+        // randomize each player's hand count and cards, discard count and cards
         int randomHandCount;
         int randomDiscardCount;
-
         for (int i = 1; i < numPlayers; i++) {
-            // randomize hand size cards for each player
-            randomHandCount = getRandomHandCount();
-            state.handCount[i] = randomHandCount;
-            setRandomHand(&state, i, randomHandCount);
-
-            // randomize discard pile size and cards
-            randomDiscardCount = getRandomDiscardCount();
-            state.discardCount[i] = randomDiscardCount;
-            setRandomDiscardPile(&state, i, randomDiscardCount);
+            randomHandCount = randomizeHand(&state, i);
+            randomDiscardCount = randomizeDiscard(&state, i);
         }
 
-        // randomize the position of the minion in the player's hand
-        int randomHandPos = 0;
-        if (randomHandCount > 0) {
-            randomHandPos = rand() % randomHandCount;
-            state.hand[currentPlayer][randomHandPos] = minion;
-        }
+        // randomize the position of the tribute card in the player's hand
+        int randomHandPos = insertCardIntoHandAtRandomPosition(&state, currentPlayer, randomHandCount, minion);
 
         int discardCountBefore = state.discardCount[currentPlayer];
         int coinsBefore = state.coins;
