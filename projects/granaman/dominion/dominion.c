@@ -941,15 +941,26 @@ int cardTribute(int currentPlayer, struct gameState *state)
         tributeRevealedCards[0] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
         state->deck[nextPlayer][state->deckCount[nextPlayer]--] = -1;
         state->deckCount[nextPlayer]--;
+
         tributeRevealedCards[1] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
         state->deck[nextPlayer][state->deckCount[nextPlayer]--] = -1;
         state->deckCount[nextPlayer]--;
     }
 
+    // manually move these two revealed cards to the player's discard pile
+    // cannot use discardCard, it is meant to work with cards from the player's hand only
+    state->discard[nextPlayer][state->discardCount[nextPlayer]] = tributeRevealedCards[0];
+    state->discardCount[nextPlayer]++;
+
+    state->discard[nextPlayer][state->discardCount[nextPlayer]] = tributeRevealedCards[1];
+    state->discardCount[nextPlayer]++;
+
+/*
     if (tributeRevealedCards[0] == tributeRevealedCards[1]) { //If we have a duplicate card, just drop one
         state->playedCards[state->playedCardCount] = tributeRevealedCards[1];
         state->playedCardCount++;
     }
+    */
 
     for (int i = 0; i < 2; i ++) {
         if (tributeRevealedCards[i] == copper || tributeRevealedCards[i] == silver || tributeRevealedCards[i] == gold) { //Treasure cards
@@ -964,6 +975,8 @@ int cardTribute(int currentPlayer, struct gameState *state)
             state->numActions = state->numActions + 2;
         }
     }
+
+
 
     return 0;
 }

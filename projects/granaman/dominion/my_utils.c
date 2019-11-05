@@ -11,6 +11,11 @@ int getRandomHandCount() {
     return random;
 }
 
+int getRandomDeckCount() {
+    int random = rand() % MAX_DECK_SIZE; // between 0 and max deck count
+    return random;
+}
+
 int getRandomDiscardCount() {
     int random = rand() % MAX_DECK; // between 0 and 500 as defined in dominion.h
     return random;
@@ -24,6 +29,12 @@ int getRandomCard() {
 void setRandomHand(struct gameState *state, int currentPlayer, int randomHandCount) {
     for (int i = 0; i < randomHandCount; i++) {
         state->hand[currentPlayer][i] = getRandomCard();
+    }
+}
+
+void setRandomDeck(struct gameState *state, int currentPlayer, int randomDeckCount) {
+    for (int i = 0; i < randomDeckCount; i++) {
+        state->deck[currentPlayer][i] = getRandomCard();
     }
 }
 
@@ -57,6 +68,15 @@ int randomizeHand(struct gameState *state, int player) {
     state->handCount[player] = randomHandCount;
     setRandomHand(state, player, randomHandCount);
     return randomHandCount;
+}
+
+int randomizeDeck(struct gameState *state, int player) {
+    // randomize a player's deck size and cards
+    // return quantity of cards in deck
+    int randomDeckCount = getRandomDeckCount();
+    state->deckCount[player] = randomDeckCount;
+    setRandomDeck(state, player, randomDeckCount);
+    return randomDeckCount;
 }
 
 int randomizeDiscard(struct gameState *state, int player) {
