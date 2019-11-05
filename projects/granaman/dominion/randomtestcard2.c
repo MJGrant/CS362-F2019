@@ -4,6 +4,7 @@
 #include "my_utils.h"
 #include "dominion.h"
 #include <time.h>
+#include <string.h>
 
 // ************************
 // Random tests for Minion card
@@ -16,23 +17,34 @@
 
 void randomTestCard2() {
 
-    // arrange
-    struct gameState state;
-    int k[10] = {1,2,3,4,5,6,7,8,9,10};
-    int currentPlayer = 1;
-    initializeGame(2, k, 2, &state);
-
     int iteration = 0;
 
     while(1) {
-        iteration++;
-        state.coins = rand()%101; // starting coins between 0 and 100
-        int choice = rand()%2+1; // random between 0 and 1, offsetted +1 (so 1 and 2)
+        // arrange
+        struct gameState state;
+        int k[10] = {1,2,3,4,5,6,7,8,9,10};
+        int currentPlayer = 1;
+        int numPlayers = rand() % 2 + 2; // random between 0-2, then shift to 2-4
 
-        // randomize hand size and cards
-        int randomHandCount = getRandomHandCount();
-        state.handCount[currentPlayer] = randomHandCount;
-        setRandomHand(&state, currentPlayer, randomHandCount);
+        initializeGame(numPlayers, k, 2, &state);
+
+        state.coins = rand() % 101; // starting coins between 0 and 100
+        int choice = rand() % 2+1; // random between 0-1, shifted to 1-2
+
+        int randomHandCount;
+        int randomDiscardCount;
+
+        for (int i = 1; i < numPlayers; i++) {
+            // randomize hand size cards for each player
+            randomHandCount = getRandomHandCount();
+            state.handCount[i] = randomHandCount;
+            setRandomHand(&state, i, randomHandCount);
+
+            // randomize discard pile size and cards
+            randomDiscardCount = getRandomDiscardCount();
+            state.discardCount[i] = randomDiscardCount;
+            setRandomDiscardPile(&state, i, randomDiscardCount);
+        }
 
         // randomize the position of the minion in the player's hand
         int randomHandPos = 0;
@@ -41,34 +53,54 @@ void randomTestCard2() {
             state.hand[currentPlayer][randomHandPos] = minion;
         }
 
-        // randomize discard pile size and cards
-        int randomDiscardCount = getRandomDiscardCount();
-        state.discardCount[currentPlayer] = randomDiscardCount;
-        setRandomDiscardPile(&state, currentPlayer, randomDiscardCount);
-
         int discardCountBefore = state.discardCount[currentPlayer];
         int coinsBefore = state.coins;
 
+        // record player hand sizes
+        int playerHandCountBefore[4] = {0,0,0,0};
+        int playerDiscardCountBefore[4] = {0,0,0,0};
+        for (int i = 0; i < numPlayers; i++) {
+            playerHandCountBefore[i] = state.handCount[i];
+            playerDiscardCountBefore[i] = state.discardCount[i];
+        }
+
+        iteration++;
+
         if (choice == 1) {
             // act
-            printf("Minion Random Test [Option 1: Gain +2 coins]\nIteration #%d, hand count: %d, hand pos: %d, discard count: %d \n", iteration, randomHandCount, randomHandPos, discardCountBefore);
+            printf("Minion Random Test [Option 1: Gain +2 coins]\nIteration #%d, # players: %d, hand count: %d, hand pos: %d, discard count: %d \n", iteration, numPlayers, randomHandCount, randomHandPos, discardCountBefore);
             cardMinion(currentPlayer, 1, 0, &state, randomHandPos);
 
             //assert
             assertEqual("Player gained 2 coins", coinsBefore+2, state.coins);
+            for (int i = 0; i < numPlayers; i++) {
+                printf("- Player #%d: hand count before: %d, discard count before: %d\n", i, playerHandCountBefore[i], playerDiscardCountBefore[i]);
+                if (i == currentPlayer) {
+                    assertDecreasedByOne("-- player discarded minion from hand", playerHandCountBefore[i], state.handCount[i]);
+                } else {
+                    assertEqual("-- player's hand count remains unchanged", playerHandCountBefore[i], state.handCount[i]);
+                }
+                assertEqual("-- player's discard pile remains unchanged", playerDiscardCountBefore[i], state.discardCount[i]);
+            }
         } else if (choice == 2) {
-            // assert
-            printf("Minion Random Test [Option 2: Discard hand, draw 4, opponents do the same]\nIteration #%d, hand count: %d, hand pos: %d, discard count: %d, \n", iteration, randomHandCount, randomHandPos, discardCountBefore);
+            // act - choice1 is 0, take an estate (if one exists in the supply)
+            printf("Minion Random Test [Option 2: Discard hand, draw 4, opponents do the same]\nIteration #%d, # players: %d, hand count: %d, hand pos: %d, discard count: %d, \n", iteration, numPlayers, randomHandCount, randomHandPos, discardCountBefore);
             cardMinion(currentPlayer, 0, 1, &state, randomHandPos);
 
-        } else {
-            printf("Error setting choice to 1 or 2\n");
+            // asserts
+
+            // any and every player who used to have 5 or more cards in their hand
+            // should have been forced to discard and draw 4 replaecment cards
+            for (int i = 0; i < numPlayers; i++) {
+                printf("- Player #%d: hand count before: %d, discard count before: %d\n", i, playerHandCountBefore[i], playerDiscardCountBefore[i]);
+                if (playerHandCountBefore[i] >= 5) {
+                    assertEqual("-- player was forced to discard hand and draw 4 cards", 4, state.handCount[i]);
+                    // fails because cardMinion puts discarded cards in "played pile" instead of discard
+                    assertEqual("-- player's discard pile grew by discarded amount", playerDiscardCountBefore[i]+playerHandCountBefore[i], state.discardCount[i]);
+                }
+            }
+
         }
-        // act
-
-
-        // act - choice1 is 0, take an estate (if one exists in the supply)
-        cardBaron(currentPlayer, 0, &state);
 
         if (iteration == MAX_ITERATIONS) {
             printf("Done with %d iterations\n", MAX_ITERATIONS);
@@ -78,6 +110,7 @@ void randomTestCard2() {
 }
 
 int main() {
+    srand(time(NULL));
     randomTestCard2();
     return 0;
 }
