@@ -904,15 +904,20 @@ int cardTribute(int currentPlayer, struct gameState *state)
 
     // If the player to the left (nextPlayer) has 1 or fewer cards total between their discard and deck piles
     if ((state->discardCount[nextPlayer] + state->deckCount[nextPlayer]) <= 1) {
-        // If the next player has 1 or more cards in their deck, take from the deck
+        printf("OPPONENT HAS ZERO OR 1 CARDS BETWEEN DECK AND DISCARD\n");
+        // If the next player has that 1 card in their deck, take from the deck
         if (state->deckCount[nextPlayer] > 0) {
+            printf("deck has >0\n");
             tributeRevealedCards[0] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
+            state->deck[nextPlayer][state->deckCount[nextPlayer]--] = -1;
             state->deckCount[nextPlayer]--;
         }
         // if the player didn't have anything in their deck,
         // see if they have a card in their discard pile to reveal
         else if (state->discardCount[nextPlayer] > 0) {
+            printf("discard has >0\n");
             tributeRevealedCards[0] = state->discard[nextPlayer][state->discardCount[nextPlayer]-1];
+            state->discard[nextPlayer][state->discardCount[nextPlayer]--] = -1;
             state->discardCount[nextPlayer]--;
         }
         else {
@@ -921,22 +926,33 @@ int cardTribute(int currentPlayer, struct gameState *state)
                 printf("No cards to reveal\n");
             }
         }
-    }
-
-    // the nextPlayer has more than 1 card total
-    else {
+    } else { // the nextPlayer has more than 1 card total
         // if none of those cards are in the deck, then they must be in the discard pile
         // take 1 card from the discard pile and move it to the deck, then shuffle the deck
         if (state->deckCount[nextPlayer] == 0) {
+            // both cards must be in discard, move them to deck and take from deck
             for (int i = 0; i < state->discardCount[nextPlayer]; i++) {
                 state->deck[nextPlayer][i] = state->discard[nextPlayer][i];//Move to deck
                 state->deckCount[nextPlayer]++;
                 state->discard[nextPlayer][i] = -1;
                 state->discardCount[nextPlayer]--;
             }
-
+            // todo: bug here with shuffling, causes all cards to get copied to discard pile
             shuffle(nextPlayer,state);//Shuffle the deck
+        } else if (state->deckCount[nextPlayer] == 1 && state->discardCount[nextPlayer] == 1) {
+            // move the one discard pile card to deck
+            state->deck[nextPlayer][state->deckCount[nextPlayer]] = state->discard[nextPlayer][state->discardCount[nextPlayer]];
+            state->deckCount[nextPlayer]++;
+            state->discard[nextPlayer][state->discardCount[nextPlayer]] = -1;
+            state->discardCount[nextPlayer]--;
+            // shuffle the 2-card deck
+            shuffle(nextPlayer, state);
+            // now both cards are in the deck and ready to be moved to tributeRevealedCards
         }
+
+        // todo: does not handle the case where 1 card is in the deck and 1 card is in the discard
+
+
         // now all the cards are in the deck, so take the top 2 and set them to the tributeRevealedCards
         tributeRevealedCards[0] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
         state->deck[nextPlayer][state->deckCount[nextPlayer]--] = -1;
@@ -949,29 +965,32 @@ int cardTribute(int currentPlayer, struct gameState *state)
 
     // manually move these two revealed cards to the player's discard pile
     // cannot use discardCard, it is meant to work with cards from the player's hand only
-    state->discard[nextPlayer][state->discardCount[nextPlayer]] = tributeRevealedCards[0];
-    state->discardCount[nextPlayer]++;
+    if (tributeRevealedCards[0]) {
+        state->discard[nextPlayer][state->discardCount[nextPlayer]] = tributeRevealedCards[0];
+        state->discardCount[nextPlayer]++;
+    }
 
-    state->discard[nextPlayer][state->discardCount[nextPlayer]] = tributeRevealedCards[1];
-    state->discardCount[nextPlayer]++;
+    if (tributeRevealedCards[1]) {
+        state->discard[nextPlayer][state->discardCount[nextPlayer]] = tributeRevealedCards[1];
+        state->discardCount[nextPlayer]++;
+    }
 
-/*
+    // todo: this is problematic, it seems to just delete the dupe instead of discarding it
+    // what even is playedCards? shouldn't these be discarded?
     if (tributeRevealedCards[0] == tributeRevealedCards[1]) { //If we have a duplicate card, just drop one
         state->playedCards[state->playedCardCount] = tributeRevealedCards[1];
         state->playedCardCount++;
     }
-    */
 
     for (int i = 0; i < 2; i ++) {
         if (tributeRevealedCards[i] == copper || tributeRevealedCards[i] == silver || tributeRevealedCards[i] == gold) { //Treasure cards
             state->coins += 2;
-        }
-
-        else if (tributeRevealedCards[i] == estate || tributeRevealedCards[i] == duchy || tributeRevealedCards[i] == province || tributeRevealedCards[i] == great_hall) { //Victory Card Found
+        } else if (tributeRevealedCards[i] == estate || tributeRevealedCards[i] == duchy || tributeRevealedCards[i] == province || tributeRevealedCards[i] == great_hall) { //Victory Card Found
             drawCard(currentPlayer, state);
             drawCard(currentPlayer, state);
-        }
-        else { //Action Card
+        } else if (tributeRevealedCards[i] == -1) {
+            // do nothing if dupe
+        } else { //Action Card
             state->numActions = state->numActions + 2;
         }
     }
