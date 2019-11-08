@@ -10,8 +10,29 @@
 // Random tests for Tribute card
 
 // initializeGame params: int numPlayers, int kingdomCards[10], int randomSeed, struct gameState *state
-
 // cardTribute params: int currentPlayer, struct gameState *state
+
+// helper method for determining what type of card a given card is
+int getCardType(int card) {
+    int ret = -1;
+    if (card == copper || card == silver || card == gold) {
+        // treasure card
+        ret = 1;
+    } else if (card == estate || card == duchy || card == province || card == great_hall || card == gardens) {
+        // victory card
+        ret = 2;
+    } else if (card == adventurer || card == council_room || card == feast || card == mine || card == remodel || card == smithy || card == village || card == baron || card == minion || card == steward || card == tribute || card == ambassador || card == cutpurse || card == embargo || card == outpost || card == salvager || card == sea_hag || card == treasure_map) {
+        // action card
+        ret = 3;
+    } else if (card == great_hall) {
+        //combo action-victory card
+        ret = 4;
+    } else if (card == curse) {
+        // curse card
+        ret = 5;
+    }
+    return ret;
+}
 
 void randomTestCard3() {
 
@@ -81,7 +102,66 @@ void randomTestCard3() {
             assertEqual("Opponent revealed two cards, opponent discard pile increased by 2", playerDiscardCountBefore[pLeft]+2, state.discardCount[pLeft]);
             int card1 = state.discard[pLeft][state.discardCount[pLeft]-1];
             int card2 = state.discard[pLeft][state.discardCount[pLeft]-2];
+
             printf("Opponent revealed these TWO cards: %d and %d\n", card1, card2);
+
+            int cardType1 = getCardType(card1);
+            int cardType2 = getCardType(card2);
+            if (cardType1 == cardType2) {
+                if (cardType1 == 1) {
+                    assertEqual("Both are treasure cards, player gained +2 coins", coinsBefore+2, state.coins);
+                } else if (cardType1 == 2) {
+                    assertEqual("Both are victory cards, player drew +2 cards to hand", playerHandCountBefore[currentPlayer]+2, state.handCount[currentPlayer]);
+                } else if (cardType1 == 3) {
+                    assertEqual("Both are action cards, player gained 2 actions", numActionsBefore+2, state.numActions);
+                } else if (cardType1 == 4) {
+                    assertEqual("Both are action-victory cards, player gained 2 actions", numActionsBefore+2, state.numActions);
+                    assertEqual("Both are action-victory, player drew +2 cards to hand", playerHandCountBefore[currentPlayer]+2, state.handCount[currentPlayer]);
+                } else if (cardType1 == 5) {
+                    assertEqual("Both are curse cards, player drew no cards to hand", playerHandCountBefore[currentPlayer], state.handCount[currentPlayer]);
+                    assertEqual("Both are curse cards, player gained no actions", numActionsBefore, state.numActions);
+                    assertEqual("Both are curse cards, player gained no coins", coinsBefore, state.coins);
+                } else {
+                    printf("Both are an unhandled type!\n");
+                }
+            } else {
+                // card 1 and card 2 are different cards
+                if (cardType1 == 1) {
+                    assertEqual("Card #1 is a treasure card, player gained +2 coins", coinsBefore+2, state.coins);
+                } else if (cardType1 == 2) {
+                    assertEqual("Card #1 is a victory card, player drew +2 cards to hand", playerHandCountBefore[currentPlayer]+2, state.handCount[currentPlayer]);
+                } else if (cardType1 == 3) {
+                    assertEqual("Card #1 is an action card, player gained 2 actions", numActionsBefore+2, state.numActions);
+                } else if (cardType1 == 4) {
+                    assertEqual("Card #1 is an action-victory card, player gained 2 actions", numActionsBefore+2, state.numActions);
+                    assertEqual("Card #1 is an action-victory card, player drew +2 cards to hand", playerHandCountBefore[currentPlayer]+2, state.handCount[currentPlayer]);
+                } else if (cardType1 == 5) {
+                    assertEqual("Card #1 is a curse card, player drew no cards to hand", playerHandCountBefore[currentPlayer], state.handCount[currentPlayer]);
+                    assertEqual("Card #1 is a curse card, player gained no actions", numActionsBefore, state.numActions);
+                    assertEqual("Card #1 is a curse card, player gained no coins", coinsBefore, state.coins);
+                } else {
+                    printf("Card #1 is an unhandled type!\n");
+                }
+
+                if (cardType2 == 1) {
+                    assertEqual("Card #2 is a treasure card, player gained +2 coins", coinsBefore+2, state.coins);
+                } else if (cardType2 == 2) {
+                    assertEqual("Card #2 is a victory card, player drew +2 cards to hand", playerHandCountBefore[currentPlayer]+2, state.handCount[currentPlayer]);
+                } else if (cardType2 == 3) {
+                    assertEqual("Card #2 is an action card, player gained 2 actions", numActionsBefore+2, state.numActions);
+                } else if (cardType2 == 4) {
+                    assertEqual("Card #2 is an action-victory card, player gained 2 actions", numActionsBefore+2, state.numActions);
+                    assertEqual("Card #2 is an action-victory card, player drew +2 cards to hand", playerHandCountBefore[currentPlayer]+2, state.handCount[currentPlayer]);
+                } else if (cardType2 == 5) {
+                    assertEqual("Card #2 is a curse card, player drew no cards to hand", playerHandCountBefore[currentPlayer], state.handCount[currentPlayer]);
+                    assertEqual("Card #2 is a curse card, player gained no actions", numActionsBefore, state.numActions);
+                    assertEqual("Card #2 is a curse card, player gained no coins", coinsBefore, state.coins);
+                } else {
+                    printf("Card #2 is an unhandled type!\n");
+                }
+            }
+
+
         } else if (opponentCardCount == 1) {
             // opponent only had one card (1 in deck or 1 in discard pile and 0 in the other)
             // that card was revealed and discarded
@@ -92,7 +172,7 @@ void randomTestCard3() {
             // opponent had no cards to reveal
             // player gains no reward of any kind
             assertEqual("Opponent revealed no cards, player gained no actions", numActionsBefore, state.numActions);
-            assertEqual("Opponent revealed no cards, Player gained no coins", coinsBefore, state.coins);
+            assertEqual("Opponent revealed no cards, player gained no coins", coinsBefore, state.coins);
         }
 
         iteration++;
