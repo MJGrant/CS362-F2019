@@ -35,6 +35,7 @@ void setRandomHand(struct gameState *state, int currentPlayer, int randomHandCou
 void setRandomDeck(struct gameState *state, int currentPlayer, int randomDeckCount) {
     for (int i = 0; i < randomDeckCount; i++) {
         state->deck[currentPlayer][i] = getRandomCard();
+        printf("Player %d, random deck index %d: %d\n", currentPlayer, i, state->deck[currentPlayer][i]);
     }
 }
 

@@ -38,6 +38,10 @@ void randomTestCard3() {
 
     int iteration = 0;
 
+    // use to track that we've encountered each individual card in each possible position
+    int cardTracker1 = 0;
+    int cardTracker2 = 0;
+
     while(1) {
         // arrange
         struct gameState state;
@@ -54,10 +58,10 @@ void randomTestCard3() {
         int randomHandCount;
         int randomDeckCount;
         int randomDiscardCount;
-        for (int i = 1; i < numPlayers; i++) {
-            randomHandCount = randomizeHand(&state, i);
-            randomDeckCount = randomizeDeck(&state, i);
-            randomDiscardCount = randomizeDiscard(&state, i);
+        for (int i = 0; i < numPlayers; i++) {
+            randomHandCount = randomizeHand(&state, i)+1;
+            randomDeckCount = randomizeDeck(&state, i)+1;
+            randomDiscardCount = randomizeDiscard(&state, i)+1;
         }
 
         // randomize the position of the tribute card in the player's hand
@@ -103,10 +107,19 @@ void randomTestCard3() {
             int card1 = state.discard[pLeft][state.discardCount[pLeft]-1];
             int card2 = state.discard[pLeft][state.discardCount[pLeft]-2];
 
-            printf("Opponent revealed these TWO cards: %d and %d\n", card1, card2);
+            printf("Opponent [player %d] revealed these TWO cards: %d and %d\n", pLeft, card1, card2);
+
+            if (card1 == cardTracker1) {
+                cardTracker1++;
+            }
+
+            if (card2 == cardTracker2) {
+                cardTracker2++;
+            }
 
             int cardType1 = getCardType(card1);
             int cardType2 = getCardType(card2);
+
             if (cardType1 == cardType2) {
                 if (cardType1 == 1) {
                     assertEqual("Both are treasure cards, player gained +2 coins", coinsBefore+2, state.coins);
@@ -166,11 +179,27 @@ void randomTestCard3() {
             // opponent only had one card (1 in deck or 1 in discard pile and 0 in the other)
             // that card was revealed and discarded
             int card1 = state.discard[pLeft][state.discardCount[pLeft]-1];
-            printf("Opponent revealed this ONE card: %d\n", card1);
+            int cardType1 = getCardType(card1);
+            if (cardType1 == 1) {
+                assertEqual("Card #1 is a treasure card, player gained +2 coins", coinsBefore+2, state.coins);
+            } else if (cardType1 == 2) {
+                assertEqual("Card #1 is a victory card, player drew +2 cards to hand", playerHandCountBefore[currentPlayer]+2, state.handCount[currentPlayer]);
+            } else if (cardType1 == 3) {
+                assertEqual("Card #1 is an action card, player gained 2 actions", numActionsBefore+2, state.numActions);
+            } else if (cardType1 == 4) {
+                assertEqual("Card #1 is an action-victory card, player gained 2 actions", numActionsBefore+2, state.numActions);
+                assertEqual("Card #1 is an action-victory card, player drew +2 cards to hand", playerHandCountBefore[currentPlayer]+2, state.handCount[currentPlayer]);
+            } else if (cardType1 == 5) {
+                assertEqual("Card #1 is a curse card, player drew no cards to hand", playerHandCountBefore[currentPlayer], state.handCount[currentPlayer]);
+                assertEqual("Card #1 is a curse card, player gained no actions", numActionsBefore, state.numActions);
+                assertEqual("Card #1 is a curse card, player gained no coins", coinsBefore, state.coins);
+            } else {
+                printf("Card #1 is an unhandled type!\n");
+            }
+
         } else if (opponentCardCount == 0) {
             printf("Opponent reveals NO CARDS!\n");
-            // opponent had no cards to reveal
-            // player gains no reward of any kind
+            // opponent had no cards to reveal, player gains no reward of any kind
             assertEqual("Opponent revealed no cards, player gained no actions", numActionsBefore, state.numActions);
             assertEqual("Opponent revealed no cards, player gained no coins", coinsBefore, state.coins);
         }
@@ -178,6 +207,8 @@ void randomTestCard3() {
         iteration++;
 
         if (iteration == MAX_ITERATIONS) {
+            assertEqual("Every possible card was drawn at least once for 'card 1'", cardTracker1, 26);
+            assertEqual("Every possible card was drawn at least once for 'card 2'", cardTracker2, 26);
             printf("Done with %d iterations\n", MAX_ITERATIONS);
             break;
         }
