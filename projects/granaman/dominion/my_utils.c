@@ -6,6 +6,28 @@
 #include "my_utils.h"
 #include "dominion.h"
 
+// helper method for determining what type of card a given card is
+int getCardType(int card) {
+    int ret = -1;
+    if (card == copper || card == silver || card == gold) {
+        // treasure card
+        ret = 1;
+    } else if (card == estate || card == duchy || card == province || card == great_hall || card == gardens) {
+        // victory card
+        ret = 2;
+    } else if (card == adventurer || card == council_room || card == feast || card == mine || card == remodel || card == smithy || card == village || card == baron || card == minion || card == steward || card == tribute || card == ambassador || card == cutpurse || card == embargo || card == outpost || card == salvager || card == sea_hag || card == treasure_map) {
+        // action card
+        ret = 3;
+    } else if (card == great_hall) {
+        //combo action-victory card
+        ret = 4;
+    } else if (card == curse) {
+        // curse card
+        ret = 5;
+    }
+    return ret;
+}
+
 int getRandomHandCount() {
     int random = rand() % MAX_HAND_SIZE; // between 0 and max hand size
     return random;
@@ -35,7 +57,6 @@ void setRandomHand(struct gameState *state, int currentPlayer, int randomHandCou
 void setRandomDeck(struct gameState *state, int currentPlayer, int randomDeckCount) {
     for (int i = 0; i < randomDeckCount; i++) {
         state->deck[currentPlayer][i] = getRandomCard();
-        printf("Player %d, random deck index %d: %d\n", currentPlayer, i, state->deck[currentPlayer][i]);
     }
 }
 
@@ -72,10 +93,10 @@ int randomizeHand(struct gameState *state, int player) {
 }
 
 int randomizeDeck(struct gameState *state, int player) {
-    // randomize a player's deck size and cards
-    // return quantity of cards in deck
+    // now pick a new random size for the deck
     int randomDeckCount = getRandomDeckCount();
     state->deckCount[player] = randomDeckCount;
+    // and fill it with randomly picked cards
     setRandomDeck(state, player, randomDeckCount);
     return randomDeckCount;
 }
