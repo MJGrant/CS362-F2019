@@ -42,3 +42,12 @@ void assertDecreasedByOne(char *testName, int before, int after) {
         printf("x -- %s [FAILED!] %d was expected to be one less than %d.\n", testName, after, before);
     }
 }
+
+void assertAtLeast(char *testName, int atLeastThisMuch, int valueToCheck) {
+    if (valueToCheck >= atLeastThisMuch) {
+        printf("✔ -- %s [Passed] %d is greater than or equal to %d.\n", testName, valueToCheck, atLeastThisMuch);
+    } else if (valueToCheck < atLeastThisMuch) {
+        printf("x -- %s [FAILED!] %d was expected to be at least %d.\n", testName, valueToCheck, atLeastThisMuch);
+    }
+
+}
