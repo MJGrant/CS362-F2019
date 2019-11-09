@@ -204,16 +204,22 @@ void randomTestCard3() {
                 }
                 everyCombination[10] = 1;
             } else if ((cardType1 == 2 && cardType2 == 4) || (cardType1 == 4 && cardType2 == 2)) {
-                assertEqual("[Victory Card & Action-Victory Card] player gained +4 actions", numActionsBefore+4, state.numActions);
+                assertEqual("[Victory Card & Action-Victory Card] player gained +2 actions", numActionsBefore+2, state.numActions);
                 if (playerDeckAndDiscardCountBefore[currentPlayer] >= 2) {
-                    assertEqual("[Victory Card & Action-Victory Card] player had 2 cards and drew +2 cards to hand", playerHandCountBefore[currentPlayer]+2, state.handCount[currentPlayer]);
+                    assertEqual("[Victory Card & Action-Victory Card] player had 4 cards and drew +4 cards to hand", playerHandCountBefore[currentPlayer]+4, state.handCount[currentPlayer]);
+                } else if (playerDeckAndDiscardCountBefore[currentPlayer] == 3) {
+                    assertEqual("[Victory Card & Action-Victory Card] player only had 3 cards and drew +3 cards to hand", playerHandCountBefore[currentPlayer]+3, state.handCount[currentPlayer]);
+                } else if (playerDeckAndDiscardCountBefore[currentPlayer] == 2) {
+                    assertEqual("[Victory Card & Action-Victory Card] player only had 2 cards and drew +2 cards to hand", playerHandCountBefore[currentPlayer]+2, state.handCount[currentPlayer]);
                 } else if (playerDeckAndDiscardCountBefore[currentPlayer] == 1) {
                     assertEqual("[Victory Card & Action-Victory Card] player only had 1 card and drew +1 cards to hand", playerHandCountBefore[currentPlayer]+1, state.handCount[currentPlayer]);
                 } else if (playerDeckAndDiscardCountBefore[currentPlayer] == 0) {
                     assertEqual("[Victory Card & Action-Victory Card] player had no cards to draw and drew 0 cards to hand", playerHandCountBefore[currentPlayer], state.handCount[currentPlayer]);
                 }
                 everyCombination[11] = 1;
-            } else if ((cardType1 == 2 && cardType2 == 5) || (cardType1 == 5 || cardType2 == 2)) {
+            } else if ((cardType1 == 2 && cardType2 == 5) || (cardType1 == 5 && cardType2 == 2)) {
+                printf("IF WE ARE IN HERE IT IS BECAUSE CARDS ARE OF TYPES 2 and 5\n");
+
                 assertEqual("[Victory Card & Curse Card] player gained no actions", numActionsBefore, state.numActions);
                 if (playerDeckAndDiscardCountBefore[currentPlayer] >= 2) {
                     assertEqual("[Victory Card & Curse Card] player had 2 cards and drew +2 cards to hand", playerHandCountBefore[currentPlayer]+2, state.handCount[currentPlayer]);

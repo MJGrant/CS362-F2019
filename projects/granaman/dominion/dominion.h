@@ -27,8 +27,8 @@ enum CARD
 
     adventurer, // 7, action
     /* If no/only 1 treasure found, stop when full deck seen */
-    council_room,
-    feast, /* choice1 is supply # of card gained) */
+    council_room, // 8
+    feast, // 9 /* choice1 is supply # of card gained) */
     gardens,
     mine, /* choice1 is hand# of money to trash, choice2 is supply# of
 	    money to put in hand */

@@ -956,12 +956,18 @@ int cardTribute(int currentPlayer, struct gameState *state)
 
     // finally, reward prizes for each unique card type found
     for (int i = 0; i < 2; i ++) {
-        printf("Evaluating tributeRevealedCards[%d]: %d\n", i, tributeRevealedCards[i]);
+        //printf("Evaluating tributeRevealedCards[%d]: %d\n", i, tributeRevealedCards[i]);
         if (tributeRevealedCards[i] == copper || tributeRevealedCards[i] == silver || tributeRevealedCards[i] == gold) {
             //Treasure cards
             state->coins += 2;
-        } else if (tributeRevealedCards[i] == estate || tributeRevealedCards[i] == duchy || tributeRevealedCards[i] == province || tributeRevealedCards[i] == great_hall || tributeRevealedCards[i] == gardens) {
-            //Victory Card Found
+        } else if (tributeRevealedCards[i] == estate || tributeRevealedCards[i] == duchy || tributeRevealedCards[i] == province || tributeRevealedCards[i] == gardens) {
+            //Victory cards
+            drawCard(currentPlayer, state);
+            drawCard(currentPlayer, state);
+        } else if (tributeRevealedCards[i] == great_hall) {
+            // Action-victory card
+            // grants actions and draws cards
+            state->numActions = state->numActions + 2;
             drawCard(currentPlayer, state);
             drawCard(currentPlayer, state);
         } else if (tributeRevealedCards[i] == -100) {
