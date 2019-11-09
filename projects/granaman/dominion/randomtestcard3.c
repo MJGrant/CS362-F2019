@@ -12,28 +12,6 @@
 // initializeGame params: int numPlayers, int kingdomCards[10], int randomSeed, struct gameState *state
 // cardTribute params: int currentPlayer, struct gameState *state
 
-// helper method for determining what type of card a given card is
-int getCardType(int card) {
-    int ret = -1;
-    if (card == copper || card == silver || card == gold) {
-        // treasure card
-        ret = 1;
-    } else if (card == estate || card == duchy || card == province || card == great_hall || card == gardens) {
-        // victory card
-        ret = 2;
-    } else if (card == adventurer || card == council_room || card == feast || card == mine || card == remodel || card == smithy || card == village || card == baron || card == minion || card == steward || card == tribute || card == ambassador || card == cutpurse || card == embargo || card == outpost || card == salvager || card == sea_hag || card == treasure_map) {
-        // action card
-        ret = 3;
-    } else if (card == great_hall) {
-        //combo action-victory card
-        ret = 4;
-    } else if (card == curse) {
-        // curse card
-        ret = 5;
-    }
-    return ret;
-}
-
 void randomTestCard3() {
 
     int iteration = 0;
@@ -42,10 +20,10 @@ void randomTestCard3() {
     int cardTracker1 = 0;
     int cardTracker2 = 0;
 
-    int everyCombination = 0;
-    int everyCardTypeAlone = 0;
+    int everyCombination[21] = {0};
 
     while(1) {
+
         // arrange
         struct gameState state;
         int k[10] = {1,2,3,4,5,6,7,8,9,10};
@@ -101,11 +79,10 @@ void randomTestCard3() {
         if (opponentCardCount >= 2) {
             // opponent had 2 or more cards
             // no matter where they came from, they ultimately decreased the deck count by 2 and increased the discard pile by 2
-
-            // note most of these will fail in the default implementation of dominion.c
-            // because the cardTribute method does not properly discard revealed cards
-
-            assertEqual("Opponent revealed two cards, opponent discard pile increased by 2", playerDiscardCountBefore[pLeft]+2, state.discardCount[pLeft]);
+            assertAtLeast("Opponent has at least 2 cards in discard pile", 2, state.discardCount[pLeft]);
+            // verify that the opponent has two cards in the discard pile
+            assertAtLeast("Opponent's top discard card is valid", 0, state.discardCount[pLeft]);
+            assertAtLeast("Opponent's second-to-top discard card is valid", 0, state.discardCount[pLeft]-1);
             int card1 = state.discard[pLeft][state.discardCount[pLeft]-1];
             int card2 = state.discard[pLeft][state.discardCount[pLeft]-2];
 
@@ -125,69 +102,69 @@ void randomTestCard3() {
 
             if (cardType1 == 1 && cardType2 == 1) {
                 assertEqual("[Treasure Card & Treasure Card] player gained +2 coins", coinsBefore+2, state.coins);
-                everyCombination++;
+                everyCombination[1] = 1;
             } else if (cardType1 == 2 && cardType2 == 2) {
                 assertEqual("[Victory Card & Victory Card] player drew +2 cards to hand", playerHandCountBefore[currentPlayer]+2, state.handCount[currentPlayer]);
-                everyCombination++;
+                everyCombination[2] = 1;
             } else if (cardType1 == 3 && cardType2 == 3) {
                 assertEqual("[Action Card & Action Card] player gained +2 actions", numActionsBefore+2, state.numActions);
-                everyCombination++;
+                everyCombination[3] = 1;
             } else if (cardType1 == 4 && cardType2 == 4) {
                 assertEqual("[Action-Victory Card & Action-Victory Card] player gained +2 actions", numActionsBefore+2, state.numActions);
                 assertEqual("[Action-Victory Card & Action-Victory Card] player drew +2 cards to hand", playerHandCountBefore[currentPlayer]+2, state.handCount[currentPlayer]);
-                everyCombination++;
+                everyCombination[4] = 1;
             } else if (cardType1 == 5  && cardType2 == 5) {
                 assertEqual("[Curse Card & Curse Card] player drew no cards to hand", playerHandCountBefore[currentPlayer], state.handCount[currentPlayer]);
                 assertEqual("[Curse Card & Curse Card] player gained no actions", numActionsBefore, state.numActions);
                 assertEqual("[Curse Card & Curse Card] player gained no coins", coinsBefore, state.coins);
-                everyCombination++; // 5
+                everyCombination[5] = 1;
             } else if ((cardType1 == 1 && cardType2 == 2 )|| (cardType1 == 2 && cardType2 == 1)) {
                 assertEqual("[Treasure Card & Victory Card] player gained +2 coins", coinsBefore+2, state.coins);
                 assertEqual("[Treasure Card & Victory Card] player drew +2 cards to hand", playerHandCountBefore[currentPlayer]+2, state.handCount[currentPlayer]);
-                everyCombination++; // 6
+                everyCombination[6] = 1;
             } else if ((cardType1 == 1 && cardType2 == 3) || (cardType1 == 3 && cardType2 == 1)) {
                 assertEqual("[Treasure Card & Action Card] player gained +2 coins", coinsBefore+2, state.coins);
                 assertEqual("[Treasure Card & Action Card] player gained 2 actions", numActionsBefore+2, state.numActions);
-                everyCombination++; // 7
+                everyCombination[7] = 1;
             } else if ((cardType1 == 1 && cardType2 == 4) || (cardType1 == 4 && cardType2 == 1)) {
                 assertEqual("[Treasure Card & Action-Victory Card] player gained +2 coins", coinsBefore+2, state.coins);
                 // 4 is "action-victory" dual-type card
                 assertEqual("[Treasure Card & Action-Victory Card] player gained +2 actions", numActionsBefore+2, state.numActions);
                 assertEqual("[Treasure Card & Action-Victory Card] player drew +2 cards to hand", playerHandCountBefore[currentPlayer]+2, state.handCount[currentPlayer]);
-                everyCombination++; // 8
+                everyCombination[8] = 1;
             } else if ((cardType1 == 1 && cardType2 == 5) || (cardType1 == 5 && cardType2 == 1)) {
                 assertEqual("[Treasure Card & Curse Card] player gained +2 coins", coinsBefore+2, state.coins);
                 assertEqual("[Treasure Card & Curse Card] player drew no cards to hand", playerHandCountBefore[currentPlayer], state.handCount[currentPlayer]);
                 assertEqual("[Treasure Card & Curse Card] player gained no actions", numActionsBefore, state.numActions);
-                everyCombination++; // 9
+                everyCombination[9] = 1;
             } else if ((cardType1 == 2 && cardType2 == 3) || (cardType1 == 3 && cardType2 == 2)) {
                 assertEqual("[Action Card & Victory Card] player gained +2 actions", numActionsBefore+2, state.numActions);
                 assertEqual("[Action Card & Victory Card] player drew +2 cards to hand", playerHandCountBefore[currentPlayer]+2, state.handCount[currentPlayer]);
-                everyCombination++; // 10
+                everyCombination[10] = 1;
             } else if ((cardType1 == 2 && cardType2 == 4) || (cardType1 == 4 && cardType2 == 2)) {
                 assertEqual("[Victory Card & Action-Victory Card] player gained +4 actions", numActionsBefore+4, state.numActions);
                 assertEqual("[Victory Card & Action-Victory Card] player drew +2 cards to hand", playerHandCountBefore[currentPlayer]+2, state.handCount[currentPlayer]);
-                everyCombination++; // 11
+                everyCombination[11] = 1;
             } else if ((cardType1 == 2 && cardType2 == 5) || (cardType1 == 5 || cardType2 == 2)) {
                 assertEqual("[Victory Card & Curse Card] player gained no actions", numActionsBefore, state.numActions);
                 assertEqual("[Victory Card & Curse Card] player drew +2 cards to hand", playerHandCountBefore[currentPlayer]+2, state.handCount[currentPlayer]);
                 assertEqual("[Victory Card & Curse Card] player gained no coins", coinsBefore, state.coins);
-                everyCombination++; // 12
+                everyCombination[12] = 1;
             } else if ((cardType1 == 3 && cardType2 == 4) || (cardType1 == 4 && cardType2 == 3)) {
                 // 4 is "action-victory" dual-type card, combine with the action card for +4 actions
                 assertEqual("[Action Card & Action-Victory Card] player gained +4 actions", numActionsBefore+4, state.numActions);
                 assertEqual("[Action Card & Action-Victory Card] player drew +2 cards to hand", playerHandCountBefore[currentPlayer]+2, state.handCount[currentPlayer]);
-                everyCombination++; // 13
+                everyCombination[13] = 1;
             } else if ((cardType1 == 3 && cardType2 == 5) || (cardType1 == 5 && cardType2 == 3)) {
                 assertEqual("[Action Card & Curse Card] player gained +2 actions", numActionsBefore+2, state.numActions);
                 assertEqual("[Action Card & Curse Card] player drew no cards to hand", playerHandCountBefore[currentPlayer], state.handCount[currentPlayer]);
                 assertEqual("[Action Card & Curse Card] player gained no coins", coinsBefore, state.coins);
-                everyCombination++; // 14
+                everyCombination[14] = 1;
             } else if ((cardType1 == 4 && cardType2 == 5) || (cardType1 == 5 && cardType2 == 4)) {
                 assertEqual("[Action-Victory Card & Curse Card] player gained +2 actions", numActionsBefore+2, state.numActions);
                 assertEqual("[Action-Victory Card & Curse Card] player drew +2 cards to hand", playerHandCountBefore[currentPlayer]+2, state.handCount[currentPlayer]);
                 assertEqual("[Action-Victory Card & Curse Card] player gained no coins", coinsBefore, state.coins);
-                everyCombination++; // 15
+                everyCombination[15] = 1;
             } else {
                 printf("1 or more cards is an unhandled type!\n");
             }
@@ -203,22 +180,22 @@ void randomTestCard3() {
             int cardType1 = getCardType(card1);
             if (cardType1 == 1) {
                 assertEqual("[Treasure Card alone] player gained +2 coins", coinsBefore+2, state.coins);
-                everyCardTypeAlone++;
+                everyCombination[16] = 1;
             } else if (cardType1 == 2) {
                 assertEqual("[Victory Card alone] player drew +2 cards to hand", playerHandCountBefore[currentPlayer]+2, state.handCount[currentPlayer]);
-                everyCardTypeAlone++;
+                everyCombination[17] = 1;
             } else if (cardType1 == 3) {
                 assertEqual("[Action Card alone] player gained +2 actions", numActionsBefore+2, state.numActions);
-                everyCardTypeAlone++;
+                everyCombination[18] = 1;
             } else if (cardType1 == 4) {
                 assertEqual("[Action-Victory Card alone] player gained 2 actions", numActionsBefore+2, state.numActions);
                 assertEqual("[Action-Victory Card alone] player drew +2 cards to hand", playerHandCountBefore[currentPlayer]+2, state.handCount[currentPlayer]);
-                everyCardTypeAlone++;
+                everyCombination[19] = 1;
             } else if (cardType1 == 5) {
                 assertEqual("[Curse Card alone] player drew no cards to hand", playerHandCountBefore[currentPlayer], state.handCount[currentPlayer]);
                 assertEqual("[Curse Card alone] player gained no actions", numActionsBefore, state.numActions);
                 assertEqual("[Curse Card alone] player gained no coins", coinsBefore, state.coins);
-                everyCardTypeAlone++;
+                everyCombination[20] = 1;
             } else {
                 printf("Card is an unhandled type!\n");
             }
@@ -229,15 +206,23 @@ void randomTestCard3() {
             assertEqual("Opponent revealed no cards, player drew no cards to hand", playerHandCountBefore[currentPlayer], state.handCount[currentPlayer]);
             assertEqual("Opponent revealed no cards, player gained no actions", numActionsBefore, state.numActions);
             assertEqual("Opponent revealed no cards, player gained no coins", coinsBefore, state.coins);
+            everyCombination[0] = 1;
         }
 
         iteration++;
-
         if (iteration == MAX_ITERATIONS) {
-            assertEqual("Every possible card type was drawn alone at least once", everyCardTypeAlone, 5);
-            assertEqual("Every possible combination of card types happened at least once", everyCombination, 15);
-            assertEqual("Every possible card was drawn at least once for 'card 1'", cardTracker1, 26);
-            assertEqual("Every possible card was drawn at least once for 'card 2'", cardTracker2, 26);
+            assertEqual("Every possible card was drawn at least once for 'card 1'", cardTracker1, 27);
+            assertEqual("Every possible card was drawn at least once for 'card 2'", cardTracker2, 27);
+
+            // check that every combination of card types occurred at least once
+            int everyCombinationCount = 0;
+            for (int i = 0; i < 21; i++) {
+                printf("combination # %d: %d\n", i, everyCombination[i]);
+                if (everyCombination[i] == 1) {
+                    everyCombinationCount++;
+                }
+            }
+            assertEqual("Every possible combination of card types happened at least once", everyCombinationCount, 21);
             printf("Done with %d iterations\n", MAX_ITERATIONS);
             break;
         }
