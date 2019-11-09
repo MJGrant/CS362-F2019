@@ -12,7 +12,7 @@ int getCardType(int card) {
     if (card == copper || card == silver || card == gold) {
         // treasure card
         ret = 1;
-    } else if (card == estate || card == duchy || card == province || card == great_hall || card == gardens) {
+    } else if (card == estate || card == duchy || card == province || card == gardens) {
         // victory card
         ret = 2;
     } else if (card == adventurer || card == council_room || card == feast || card == mine || card == remodel || card == smithy || card == village || card == baron || card == minion || card == steward || card == tribute || card == ambassador || card == cutpurse || card == embargo || card == outpost || card == salvager || card == sea_hag || card == treasure_map) {
