@@ -12,6 +12,42 @@
 // initializeGame params: int numPlayers, int kingdomCards[10], int randomSeed, struct gameState *state
 // cardTribute params: int currentPlayer, struct gameState *state
 
+void randomTestCard3b() {
+    // tests that every card's type is properly returned
+    assertEqual("Copper is a Treasure card", getCardType(copper), 1);
+    assertEqual("Silver is a Treasure card", getCardType(silver), 1);
+    assertEqual("Gold is a Treasure card", getCardType(gold), 1);
+
+    assertEqual("Estate is a Victory card", getCardType(estate), 2);
+    assertEqual("Duchy is a Victory card", getCardType(duchy), 2);
+    assertEqual("Province is a Victory card", getCardType(province), 2);
+    assertEqual("Gardens is a Victory card", getCardType(estate), 2);
+
+    assertEqual("Adventurer is an Action card", getCardType(adventurer), 3);
+    assertEqual("Council Room is an Action card", getCardType(council_room), 3);
+    assertEqual("Feast is an Action card", getCardType(feast), 3);
+    assertEqual("Mine is an Action card", getCardType(mine), 3);
+    assertEqual("Remodel is an Action card", getCardType(remodel), 3);
+    assertEqual("Smithy is an Action card", getCardType(smithy), 3);
+    assertEqual("Village is an Action card", getCardType(village), 3);
+    assertEqual("Baron is an Action card", getCardType(baron), 3);
+    assertEqual("Minion is an Action card", getCardType(minion), 3);
+    assertEqual("Steward is an Action card", getCardType(steward), 3);
+    assertEqual("Tribute is an Action card", getCardType(tribute), 3);
+    assertEqual("Ambassador is an Action card", getCardType(ambassador), 3);
+    assertEqual("Cutpurse is an Action card", getCardType(cutpurse), 3);
+    assertEqual("Embargo is an Action card", getCardType(embargo), 3);
+    assertEqual("Outpost is an Action card", getCardType(outpost), 3);
+    assertEqual("Salvager is an Action card", getCardType(salvager), 3);
+    assertEqual("Sea Hag is an Action card", getCardType(sea_hag), 3);
+    assertEqual("Treasure Map is an Action card", getCardType(treasure_map), 3);
+
+    assertEqual("Great Hall is an Action-Victory card", getCardType(great_hall), 4);
+
+    assertEqual("Curse is a Curse card", getCardType(curse), 5);
+}
+
+
 void randomTestCard3() {
 
     int iteration = 0;
@@ -85,10 +121,10 @@ void randomTestCard3() {
             // no matter where they came from, they ultimately decreased the deck count by 2 and increased the discard pile by 2
             assertAtLeast("Opponent has at least 2 cards in discard pile", 2, state.discardCount[pLeft]);
             // verify that the opponent has two cards in the discard pile
-            assertAtLeast("Opponent's top discard card is valid", 0, state.discardCount[pLeft]);
-            assertAtLeast("Opponent's second-to-top discard card is valid", 0, state.discardCount[pLeft]-1);
             int card1 = state.discard[pLeft][state.discardCount[pLeft]-1];
             int card2 = state.discard[pLeft][state.discardCount[pLeft]-2];
+            assertAtLeast("Opponent's top discard card is valid", 0, card1);
+            assertAtLeast("Opponent's second-to-top discard card is valid", 0, card2);
 
             cardTracker1[card1] = 1;
             cardTracker2[card2] = 1;
@@ -308,5 +344,6 @@ void randomTestCard3() {
 int main() {
     srand(time(NULL));
     randomTestCard3();
+    randomTestCard3b();
     return 0;
 }
