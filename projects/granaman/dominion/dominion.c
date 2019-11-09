@@ -1,5 +1,6 @@
 #include "dominion.h"
 #include "dominion_helpers.h"
+#include "my_utils.h"
 #include "rngs.h"
 #include <stdio.h>
 #include <math.h>
@@ -904,20 +905,19 @@ int cardTribute(int currentPlayer, struct gameState *state)
 
     // If the player to the left (nextPlayer) has 1 or fewer cards total between their discard and deck piles
     if ((state->discardCount[nextPlayer] + state->deckCount[nextPlayer]) <= 1) {
-        printf("OPPONENT HAS ZERO OR 1 CARDS BETWEEN DECK AND DISCARD\n");
         // If the next player has that 1 card in their deck, take from the deck
         if (state->deckCount[nextPlayer] > 0) {
-            printf("deck has >0\n");
+            printf("discard is empty, deck has 1\n");
             tributeRevealedCards[0] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
-            state->deck[nextPlayer][state->deckCount[nextPlayer]--] = -1;
+            state->deck[nextPlayer][state->deckCount[nextPlayer]-1] = -1;
             state->deckCount[nextPlayer]--;
         }
         // if the player didn't have anything in their deck,
         // see if they have a card in their discard pile to reveal
         else if (state->discardCount[nextPlayer] > 0) {
-            printf("discard has >0\n");
+            printf("deck is empty, discard has 1\n");
             tributeRevealedCards[0] = state->discard[nextPlayer][state->discardCount[nextPlayer]-1];
-            state->discard[nextPlayer][state->discardCount[nextPlayer]--] = -1;
+            state->discard[nextPlayer][state->discardCount[nextPlayer]-1] = -1;
             state->discardCount[nextPlayer]--;
         }
         else {
@@ -926,20 +926,26 @@ int cardTribute(int currentPlayer, struct gameState *state)
                 printf("No cards to reveal\n");
             }
         }
-    } else { // the nextPlayer has more than 1 card total
+    } else {
+        // else, the nextPlayer has 2+ cards between deck and discard
+
         // if none of those cards are in the deck, then they must be in the discard pile
         // take 1 card from the discard pile and move it to the deck, then shuffle the deck
         if (state->deckCount[nextPlayer] == 0) {
             printf("both cards are in discard pile, moving them to deck and taking from deck\n");
             // both cards must be in discard, move them to deck and take from deck
             for (int i = 0; i < state->discardCount[nextPlayer]; i++) {
+                // if we're here, we know the deck is empty
+                // move every card from discard to deck
                 state->deck[nextPlayer][i] = state->discard[nextPlayer][i];//Move to deck
                 state->deckCount[nextPlayer]++;
                 state->discard[nextPlayer][i] = -1;
-                state->discardCount[nextPlayer]--;
             }
-            // todo: bug here with shuffling, causes all cards to get copied to discard pile
-            shuffle(nextPlayer,state);//Shuffle the deck
+            // now that we've moved every card from discard to deck, set deck count to zero
+            // do not decrement the count in the for-loop above, it aborts the loop early
+            state->discardCount[nextPlayer] = 0;
+            // shuffle the deck
+            shuffle(nextPlayer,state);
         } else if (state->deckCount[nextPlayer] == 1 && state->discardCount[nextPlayer] == 1) {
             printf("1 card is in deck, 1 card is in discard, moving the one card in discard to deck and shuffling the deck\n");
             // move the one discard pile card to deck
@@ -961,9 +967,9 @@ int cardTribute(int currentPlayer, struct gameState *state)
         // now all the cards are in the deck,
         // so take the top 2 and set them to the tributeRevealedCards/
         // and remove them from the player's deck
-        printf("pulling tributeRevealedCards from deck, which has %d cards in it\n", state->deckCount[nextPlayer]);
+        printf("Pulling tributeRevealedCards from deck, which has %d cards in it\n", state->deckCount[nextPlayer]);
         for (int i = 0; i < state->deckCount[nextPlayer]; i++) {
-            printf("Deck[%d] card: %d\n", i, state->deck[nextPlayer][state->deckCount[nextPlayer]-i]);
+            printf("Deck[%d] card: %d\n", i, state->deck[nextPlayer][i]);
         }
 
         for (int i = 0; i < 2; i++) {
@@ -972,7 +978,7 @@ int cardTribute(int currentPlayer, struct gameState *state)
             if (state->deck[nextPlayer][state->deckCount[nextPlayer]-1] >= 0) {
                 printf("Setting tributeRevealedCards[%d] to %d\n", i, state->deck[nextPlayer][state->deckCount[nextPlayer]-1]);
                 tributeRevealedCards[i] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
-                state->deck[nextPlayer][state->deckCount[nextPlayer]--] = -1; //empty out that slot
+                state->deck[nextPlayer][state->deckCount[nextPlayer]-1] = -1; //empty out that slot
                 state->deckCount[nextPlayer]--;
             } else {
                 printf("Setting tributeRevealedCards[%d] to -1\n", i);
@@ -998,9 +1004,12 @@ int cardTribute(int currentPlayer, struct gameState *state)
     }
 
     // todo: this is problematic, it seems to just delete the dupe instead of discarding it
+    // todo: doesnt catch type dupes
     // what even is playedCards? shouldn't these be discarded?
-    if (tributeRevealedCards[0] == tributeRevealedCards[1]) { //If we have a duplicate card, just drop one
+    if (getCardType(tributeRevealedCards[0]) == getCardType(tributeRevealedCards[1])) {
+        //If we have a duplicate card type, set the second one to -100 so we can avoid giving prizes for it
         tributeRevealedCards[1] = -100;
+        // old code
         //state->playedCards[state->playedCardCount] = tributeRevealedCards[1];
         //state->playedCardCount++;
     }
