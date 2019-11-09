@@ -961,12 +961,21 @@ int cardTribute(int currentPlayer, struct gameState *state)
         // now all the cards are in the deck,
         // so take the top 2 and set them to the tributeRevealedCards/
         // and remove them from the player's deck
+        printf("pulling tributeRevealedCards from deck, which has %d cards in it\n", state->deckCount[nextPlayer]);
+        for (int i = 0; i < state->deckCount[nextPlayer]; i++) {
+            printf("Deck[%d] card: %d\n", i, state->deck[nextPlayer][state->deckCount[nextPlayer]-i]);
+        }
+
         for (int i = 0; i < 2; i++) {
+            // if this spot in the deck is a valid card, take it
+            printf("Considering this card from top of the deck: %d\n", state->deck[nextPlayer][state->deckCount[nextPlayer]-1]);
             if (state->deck[nextPlayer][state->deckCount[nextPlayer]-1] >= 0) {
+                printf("Setting tributeRevealedCards[%d] to %d\n", i, state->deck[nextPlayer][state->deckCount[nextPlayer]-1]);
                 tributeRevealedCards[i] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
                 state->deck[nextPlayer][state->deckCount[nextPlayer]--] = -1; //empty out that slot
                 state->deckCount[nextPlayer]--;
             } else {
+                printf("Setting tributeRevealedCards[%d] to -1\n", i);
                 tributeRevealedCards[i] = -1;
             }
         }
@@ -978,6 +987,7 @@ int cardTribute(int currentPlayer, struct gameState *state)
         printf("Moving %d to discard pile\n", tributeRevealedCards[0]);
         state->discard[nextPlayer][state->discardCount[nextPlayer]] = tributeRevealedCards[0];
         state->discardCount[nextPlayer]++;
+        printf("discardCount[player %d] is now: %d\n", nextPlayer, state->discardCount[nextPlayer]);
     }
 
     if (tributeRevealedCards[1] >= 0) {
@@ -996,15 +1006,16 @@ int cardTribute(int currentPlayer, struct gameState *state)
     }
 
     for (int i = 0; i < 2; i ++) {
+        printf("Checking tributeRevealedCards[%d], which contains %d\n", i, tributeRevealedCards[i]);
         if (tributeRevealedCards[i] == copper || tributeRevealedCards[i] == silver || tributeRevealedCards[i] == gold) { //Treasure cards
             state->coins += 2;
-        } else if (tributeRevealedCards[i] == estate || tributeRevealedCards[i] == duchy || tributeRevealedCards[i] == province || tributeRevealedCards[i] == great_hall) { //Victory Card Found
+        } else if (tributeRevealedCards[i] == estate || tributeRevealedCards[i] == duchy || tributeRevealedCards[i] == province || tributeRevealedCards[i] == great_hall || tributeRevealedCards[i] == gardens) { //Victory Card Found
             drawCard(currentPlayer, state);
             drawCard(currentPlayer, state);
         } else if (tributeRevealedCards[i] == -100) {
-            printf("card is a dupe, no prizes\n");
+            printf("card %d is a dupe, no prizes\n", tributeRevealedCards[i]);
         } else if (tributeRevealedCards[i] == curse) {
-            printf("card is a curse, no prizes\n");
+            printf("card %d is a curse, no prizes\n", tributeRevealedCards[i]);
         } else if (tributeRevealedCards[i] == -1) {
             printf("no card was revealed, no prizes\n");
         } else { //Action Card
