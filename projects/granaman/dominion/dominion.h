@@ -16,9 +16,9 @@
 /* hand# means index of a card in current active player's hand */
 
 enum CARD
-{   curse = 0,
+{   curse = 0, // 0
     estate,
-    duchy,
+    duchy, // 2
     province, // 3
 
     copper,
@@ -41,11 +41,11 @@ enum CARD
     great_hall,
     minion, /* choice1:  1 = +2 coin, 2 = redraw */
     steward, /* choice1: 1 = +2 card, 2 = +2 coin, 3 = trash 2 (choice2,3) */
-    tribute,
+    tribute, // 19
 
     ambassador, /* choice1 = hand#, choice2 = number to return to supply */
     cutpurse,
-    embargo, /* choice1 = supply# */
+    embargo, // 22, action card /* choice1 = supply# */
     outpost,
     salvager, /* choice1 = hand# to trash */
     sea_hag,
