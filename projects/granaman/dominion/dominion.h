@@ -16,16 +16,16 @@
 /* hand# means index of a card in current active player's hand */
 
 enum CARD
-{   curse = 0, // 0
-    estate,
-    duchy, // 2
-    province, // 3
+{   curse = 0, // 0, curse
+    estate, // 1, victory
+    duchy, // 2, victory
+    province, // 3, victory
 
-    copper,
-    silver,
-    gold, // 6
+    copper, // 4, treasure
+    silver, // 5, treasure
+    gold, // 6, treasure
 
-    adventurer,
+    adventurer, // 7, action
     /* If no/only 1 treasure found, stop when full deck seen */
     council_room,
     feast, /* choice1 is supply # of card gained) */
@@ -36,20 +36,20 @@ enum CARD
     smithy,
     village, // 14
 
-    baron, /* choice1: boolean for discard of estate */
+    baron, // 15 /* choice1: boolean for discard of estate */
     /* Discard is always of first (lowest index) estate */
-    great_hall,
-    minion, /* choice1:  1 = +2 coin, 2 = redraw */
-    steward, /* choice1: 1 = +2 card, 2 = +2 coin, 3 = trash 2 (choice2,3) */
+    great_hall, // 16
+    minion, // 17 /* choice1:  1 = +2 coin, 2 = redraw */
+    steward, //18 /* choice1: 1 = +2 card, 2 = +2 coin, 3 = trash 2 (choice2,3) */
     tribute, // 19
 
-    ambassador, /* choice1 = hand#, choice2 = number to return to supply */
-    cutpurse,
+    ambassador, // 20 /* choice1 = hand#, choice2 = number to return to supply */
+    cutpurse, // 21
     embargo, // 22, action card /* choice1 = supply# */
-    outpost,
-    salvager, /* choice1 = hand# to trash */
-    sea_hag,
-    treasure_map // 26
+    outpost, // 23
+    salvager, // 24 /* choice1 = hand# to trash */
+    sea_hag, // 25
+    treasure_map // 26, action card
 };
 
 struct gameState {
