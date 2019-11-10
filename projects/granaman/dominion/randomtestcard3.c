@@ -205,7 +205,7 @@ void randomTestCard3() {
                 everyCombination[10] = 1;
             } else if ((cardType1 == 2 && cardType2 == 4) || (cardType1 == 4 && cardType2 == 2)) {
                 assertEqual("[Victory Card & Action-Victory Card] player gained +2 actions", numActionsBefore+2, state.numActions);
-                if (playerDeckAndDiscardCountBefore[currentPlayer] >= 2) {
+                if (playerDeckAndDiscardCountBefore[currentPlayer] >= 4) {
                     assertEqual("[Victory Card & Action-Victory Card] player had 4 cards and drew +4 cards to hand", playerHandCountBefore[currentPlayer]+4, state.handCount[currentPlayer]);
                 } else if (playerDeckAndDiscardCountBefore[currentPlayer] == 3) {
                     assertEqual("[Victory Card & Action-Victory Card] player only had 3 cards and drew +3 cards to hand", playerHandCountBefore[currentPlayer]+3, state.handCount[currentPlayer]);
