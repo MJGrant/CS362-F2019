@@ -3,7 +3,7 @@
 
 #include "dominion.h"
 
-#define MAX_ITERATIONS 1000
+#define MAX_ITERATIONS 2000
 #define MAX_HAND_SIZE 10 // up to 500 is allowed but realistically the player's hand size is rarely over 10
 #define MAX_DECK_SIZE 4
 #define MAX_DISCARD_SIZE 4
