@@ -30,7 +30,7 @@ void minionTest1a() {
     // set the player's hand to a specific arrangement of cards
     state.handCount[currentPlayer] = 4;
     state.hand[currentPlayer][0] = baron;
-    state.hand[currentPlayer][1] = minion; // one estate in hand but shouldn't affect outcome
+    state.hand[currentPlayer][1] = minion; // one minion in hand but shouldn't affect outcome
     state.hand[currentPlayer][2] = copper;
     state.hand[currentPlayer][3] = copper;
     int handCountBefore = state.handCount[currentPlayer];
