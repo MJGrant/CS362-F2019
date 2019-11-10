@@ -19,6 +19,10 @@ void randomTestCard2() {
 
     int iteration = 0;
 
+    int choice1PlayerGained2Coins = 0;
+    int choice2OpponentDiscardedHand = 0;
+    int choice2OpponentDidNotDiscard = 0;
+
     while(1) {
         // arrange
         struct gameState state;
@@ -71,6 +75,7 @@ void randomTestCard2() {
                 }
                 assertEqual("-- player's discard pile remains unchanged", playerDiscardCountBefore[i], state.discardCount[i]);
             }
+            choice1PlayerGained2Coins++;
         } else if (choice == 2) {
             // act - choice1 is 0, take an estate (if one exists in the supply)
             printf("Minion Random Test [Option 2: Discard hand, draw 4, opponents do the same]\nIteration #%d, # players: %d, hand count: %d, hand pos: %d, discard count: %d, \n", iteration, numPlayers, randomHandCount, randomHandPos, discardCountBefore);
@@ -86,6 +91,9 @@ void randomTestCard2() {
                     assertEqual("-- player was forced to discard hand and draw 4 cards", 4, state.handCount[i]);
                     // fails because cardMinion puts discarded cards in "played pile" instead of discard
                     assertEqual("-- player's discard pile grew by discarded amount", playerDiscardCountBefore[i]+playerHandCountBefore[i], state.discardCount[i]);
+                    choice2OpponentDiscardedHand++;
+                } else {
+                    choice2OpponentDidNotDiscard++;
                 }
             }
 
@@ -93,6 +101,10 @@ void randomTestCard2() {
 
         if (iteration == MAX_ITERATIONS) {
             printf("Done with %d iterations\n", MAX_ITERATIONS);
+
+            assertAtLeast("Tested scenario [player discarded Minion for +2 coins] at least 300 randomly-chosen ways", 300, choice1PlayerGained2Coins);
+            assertAtLeast("Tested scenario [player forced another player to discard hand] at least 300 randomly-chosen ways", 300, choice2OpponentDiscardedHand);
+            assertAtLeast("Tested scenario [player did not force another player to discard hand] at least 300 randomly-chosen ways", 300, choice2OpponentDidNotDiscard);
             break;
         }
     }
