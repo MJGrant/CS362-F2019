@@ -70,7 +70,6 @@ void randomTestCard3() {
         initializeGame(numPlayers, k, 2, &state);
 
         state.coins = rand() % 101; // starting coins between 0 and 100
-        int choice = rand() % 2+1; // random between 0-1, shifted to 1-2
 
         // randomize each player's hand count and cards, discard count and cards
         int randomHandCount;
@@ -83,9 +82,8 @@ void randomTestCard3() {
         }
 
         // randomize the position of the tribute card in the player's hand
-        int randomHandPos = insertCardIntoHandAtRandomPosition(&state, currentPlayer, randomHandCount, tribute);
+        insertCardIntoHandAtRandomPosition(&state, currentPlayer, randomHandCount, tribute);
 
-        int discardCountBefore = state.discardCount[currentPlayer];
         int coinsBefore = state.coins;
         int numActionsBefore = state.numActions;
         // record player hand sizes
