@@ -73,12 +73,10 @@ void randomTestCard3() {
 
         // randomize each player's hand count and cards, discard count and cards
         int randomHandCount;
-        int randomDeckCount;
-        int randomDiscardCount;
         for (int i = 0; i < numPlayers; i++) {
-            randomHandCount = randomizeHand(&state, i)+1;
-            randomDeckCount = randomizeDeck(&state, i)+1;
-            randomDiscardCount = randomizeDiscard(&state, i)+1;
+            randomHandCount = randomizeHand(&state, i);
+            randomizeDeck(&state, i);
+            randomizeDiscard(&state, i);
         }
 
         // randomize the position of the tribute card in the player's hand
@@ -216,8 +214,6 @@ void randomTestCard3() {
                 }
                 everyCombination[11] = 1;
             } else if ((cardType1 == 2 && cardType2 == 5) || (cardType1 == 5 && cardType2 == 2)) {
-                printf("IF WE ARE IN HERE IT IS BECAUSE CARDS ARE OF TYPES 2 and 5\n");
-
                 assertEqual("[Victory Card & Curse Card] player gained no actions", numActionsBefore, state.numActions);
                 if (playerDeckAndDiscardCountBefore[currentPlayer] >= 2) {
                     assertEqual("[Victory Card & Curse Card] player had 2 cards and drew +2 cards to hand", playerHandCountBefore[currentPlayer]+2, state.handCount[currentPlayer]);
