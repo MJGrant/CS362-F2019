@@ -23,12 +23,12 @@ void randomTestCard2() {
     int choice2OpponentDiscardedHand = 0;
     int choice2OpponentDidNotDiscard = 0;
 
-    while(1) {
+    while (iteration < MAX_ITERATIONS) {
         // arrange
         struct gameState state;
         int k[10] = {1,2,3,4,5,6,7,8,9,10};
-        int currentPlayer = 1;
         int numPlayers = getRandomNumberOfPlayers();
+        int currentPlayer = rand() % numPlayers; // random between 0 and numPlayers
 
         initializeGame(numPlayers, k, 2, &state);
 
@@ -37,15 +37,13 @@ void randomTestCard2() {
 
         // randomize each player's hand count and cards, discard count and cards
         int randomHandCount;
-        int randomDiscardCount;
         for (int i = 1; i < numPlayers; i++) {
             randomHandCount = randomizeHand(&state, i);
-            randomDiscardCount = randomizeDiscard(&state, i);
+            randomizeDiscard(&state, i);
         }
 
         // randomize the position of the tribute card in the player's hand
         int randomHandPos = insertCardIntoHandAtRandomPosition(&state, currentPlayer, randomHandCount, minion);
-
         int discardCountBefore = state.discardCount[currentPlayer];
         int coinsBefore = state.coins;
 
@@ -61,7 +59,7 @@ void randomTestCard2() {
 
         if (choice == 1) {
             // act
-            printf("Minion Random Test [Option 1: Gain +2 coins]\nIteration #%d, # players: %d, hand count: %d, hand pos: %d, discard count: %d \n", iteration, numPlayers, randomHandCount, randomHandPos, discardCountBefore);
+            printf("Minion Random Test [Option 1: Gain +2 coins]\nIteration #%d, # players: %d, hand count: %d, hand pos: %d, discard count: %d, current player: %d \n", iteration, numPlayers, randomHandCount, randomHandPos, discardCountBefore, currentPlayer);
             cardMinion(currentPlayer, 1, 0, &state, randomHandPos);
 
             //assert
@@ -78,7 +76,7 @@ void randomTestCard2() {
             choice1PlayerGained2Coins++;
         } else if (choice == 2) {
             // act - choice1 is 0, take an estate (if one exists in the supply)
-            printf("Minion Random Test [Option 2: Discard hand, draw 4, opponents do the same]\nIteration #%d, # players: %d, hand count: %d, hand pos: %d, discard count: %d, \n", iteration, numPlayers, randomHandCount, randomHandPos, discardCountBefore);
+            printf("Minion Random Test [Option 2: Discard hand, draw 4, opponents do the same]\nIteration #%d, # players: %d, hand count: %d, hand pos: %d, discard count: %d, current player: %d \n", iteration, numPlayers, randomHandCount, randomHandPos, discardCountBefore, currentPlayer);
             cardMinion(currentPlayer, 0, 1, &state, randomHandPos);
 
             // asserts
@@ -93,20 +91,27 @@ void randomTestCard2() {
                     assertEqual("-- player's discard pile grew by discarded amount", playerDiscardCountBefore[i]+playerHandCountBefore[i], state.discardCount[i]);
                     choice2OpponentDiscardedHand++;
                 } else {
-                    choice2OpponentDidNotDiscard++;
+                    // opponent was not forced to redraw because opponent has 4 or fewer cards in hand
+                    // verify hand size is the same
+                    // but only do this check for opponents, not current player
+                    // current player is not beholden to the "must have 5+ cards in hand to redraw" rule
+                    if (i != currentPlayer) {
+                        assertEqual("-- player's hand size remains unchanged", playerHandCountBefore[i], state.handCount[i]);
+                        choice2OpponentDidNotDiscard++;
+                    }
                 }
             }
-
         }
+    }
 
-        if (iteration == MAX_ITERATIONS) {
-            printf("Done with %d iterations\n", MAX_ITERATIONS);
 
-            assertAtLeast("Tested scenario [player discarded Minion for +2 coins] at least 300 randomly-chosen ways", 300, choice1PlayerGained2Coins);
-            assertAtLeast("Tested scenario [player forced another player to discard hand] at least 300 randomly-chosen ways", 300, choice2OpponentDiscardedHand);
-            assertAtLeast("Tested scenario [player did not force another player to discard hand] at least 300 randomly-chosen ways", 300, choice2OpponentDidNotDiscard);
-            break;
-        }
+
+    if (iteration == MAX_ITERATIONS) {
+        printf("Done with %d iterations\n", MAX_ITERATIONS);
+
+        assertAtLeast("Tested scenario [player discarded Minion for +2 coins] at least 300 randomly-chosen ways", 300, choice1PlayerGained2Coins);
+        assertAtLeast("Tested scenario [player forced another player to discard hand] at least 300 randomly-chosen ways", 300, choice2OpponentDiscardedHand);
+        assertAtLeast("Tested scenario [player did not force another player to discard hand] at least 300 randomly-chosen ways", 300, choice2OpponentDidNotDiscard);
     }
 }
 
