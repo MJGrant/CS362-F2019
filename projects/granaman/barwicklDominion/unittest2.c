@@ -9,7 +9,9 @@
 
 // initializeGame params: int numPlayers, int kingdomCards[10], int randomSeed, struct gameState *state
 
-// cardMinion params: int currentPlayer, int choice1, int choice2, struct gameState *state, int handPos
+// OLD cardMinion params: int currentPlayer, int choice1, int choice2, struct gameState *state, int handPos
+// NEW minionRefactor params: int choice1, int choice2, struct gameState *state, int handPos
+
 // choices are mutually exclusive
 // if choice1 is 1 = discard minion card and get two coins
 // else if choice2 is 1 = discard hand, redraw 4, other players with 5+ cards discard hand and draw 4
@@ -38,7 +40,7 @@ void minionTest1a() {
     // act
     // set choice1 (2nd param) to 1 (true) to use the "get 2 coins" card option
     // last param is "handPos", the position of the minion card in the player's hand
-    cardMinion(currentPlayer, 1, 0, &state, 1);
+    minionRefactor(currentPlayer, 1, 0, &state, 1);
 
     // assert
     assertIncreasedByOne("The player gained an action", numActionsBefore, state.numActions);
@@ -99,7 +101,7 @@ void minionTest2a() {
     // act
     // set choice1 (2nd param) to 1 (true) to use the "get 2 coins" card option
     // last param is "handPos", the position of the minion card in the player's hand
-    cardMinion(currentPlayer, 0, 1, &state, 1);
+    minionRefactor(currentPlayer, 0, 1, &state, 1);
 
     // assert
     assertIncreasedByOne("The player gained an action", numActionsBefore, state.numActions);
@@ -141,7 +143,7 @@ void minionTest2b() {
     state.handCount[0] = 3;
 
     // act
-    cardMinion(currentPlayer, 0, 1, &state, 1);
+    minionRefactor(currentPlayer, 0, 1, &state, 1);
 
     // assert
     assertEqual("Opponent was not forced to re-draw, still has 3 cards in hand", 3, state.handCount[0]);

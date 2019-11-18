@@ -9,7 +9,8 @@
 
 // initializeGame params: int numPlayers, int kingdomCards[10], int randomSeed, struct gameState *state
 
-// cardAmbassador params: int currentPlayer, int choice1, int choice2, struct gameState *state, int handPos)
+// OLD cardAmbassador params: int currentPlayer, int choice1, int choice2, struct gameState *state, int handPos)
+// NEW ambassadorRefactor params: int choice1, int choice2, struct gameState *state, int handPos
 
 //choice1 represents the card the player has chosen to discard
 //choice2 represents how many of that card the player has chosen to discard
@@ -43,7 +44,7 @@ void ambassadorTest1() {
     // set choice1 (second param) to estate to indicate which card to reveal
     // set choice2 (param after that) to indicate how many
     // the last param is the position of the ambassador card itself in the player's hand
-    ret = cardAmbassador(currentPlayer, 2, 2, &state, 0);
+    ret = ambassadorRefactor(currentPlayer, 2, 2, &state, 0);
 
     // assert
     int ambassadorHandCount = 0;
@@ -70,21 +71,21 @@ void ambassadorTest1() {
 
     // act
     // set choice1 and handpos to the same number (the ambassador card itself is at 0)
-    ret = cardAmbassador(currentPlayer, 0, 1, &state, 0);
+    ret = ambassadorRefactor(currentPlayer, 0, 1, &state, 0);
 
     // assert
     assertEqual("Attempting to discard the Ambassador card itself is rejected", ret, -1);
 
     // act
     // player attempts to discard more than the allowed number of cards
-    ret = cardAmbassador(currentPlayer, 2, 3, &state, 0);
+    ret = ambassadorRefactor(currentPlayer, 2, 3, &state, 0);
 
     // assert
     assertEqual("Attempting to discard 3 copies of a card is rejected", ret, -1);
 
     // act
     // player attempts to discard zero cards
-    ret = cardAmbassador(currentPlayer, 2, 0, &state, 0);
+    ret = ambassadorRefactor(currentPlayer, 2, 0, &state, 0);
 
     // assert
     assertEqual("[MY BUG] Attempting to discard 0 copies of a card is allowed", ret, 0);
@@ -98,7 +99,7 @@ void ambassadorTest1() {
 
     // act
     // player attempts to discard estate, but specifies 2 when the player only has 1 estate to give
-    ret = cardAmbassador(currentPlayer, 2, 2, &state, 0);
+    ret = ambassadorRefactor(currentPlayer, 2, 2, &state, 0);
 
     // assert
     // BUG: the game lets this happen, it "generates" copies of the card the player is attempting to discard
@@ -107,7 +108,7 @@ void ambassadorTest1() {
 
     //assert
     // test that the code returns an error when the player selects a card not in their hand? (UI may not allow it)
-    ret = cardAmbassador(currentPlayer, 3, 2, &state, 0);
+    ret = ambassadorRefactor(currentPlayer, 3, 2, &state, 0);
     assertEqual("[MY BUG] Attempting to discard a card the player doesn't have is rejected", ret, -1);
 
 

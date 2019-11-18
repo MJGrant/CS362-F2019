@@ -11,7 +11,9 @@
 
 // initializeGame params: int numPlayers, int kingdomCards[10], int randomSeed, struct gameState *state
 
-// cardMinion params: int currentPlayer, int choice1, int choice2, struct gameState *state, int handPos
+// OLD cardMinion params: int currentPlayer, int choice1, int choice2, struct gameState *state, int handPos
+// NEW minionRefactor params: int choice1, int choice2, struct gameState *state, int handPos
+
 // choice1 = get +2 coins
 // choice2 = discard hand, draw 4 new cards, force all players with 5+ cards to also discard and draw 4
 
@@ -60,7 +62,7 @@ void randomTestCard2() {
         if (choice == 1) {
             // act
             printf("Minion Random Test [Option 1: Gain +2 coins]\nIteration #%d, # players: %d, hand count: %d, hand pos: %d, discard count: %d, current player: %d \n", iteration, numPlayers, randomHandCount, randomHandPos, discardCountBefore, currentPlayer);
-            cardMinion(currentPlayer, 1, 0, &state, randomHandPos);
+            minionRefactor(currentPlayer, 1, 0, &state, randomHandPos);
 
             //assert
             assertEqual("Player gained 2 coins", coinsBefore+2, state.coins);
@@ -77,7 +79,7 @@ void randomTestCard2() {
         } else if (choice == 2) {
             // act - choice1 is 0, take an estate (if one exists in the supply)
             printf("Minion Random Test [Option 2: Discard hand, draw 4, opponents do the same]\nIteration #%d, # players: %d, hand count: %d, hand pos: %d, discard count: %d, current player: %d \n", iteration, numPlayers, randomHandCount, randomHandPos, discardCountBefore, currentPlayer);
-            cardMinion(currentPlayer, 0, 1, &state, randomHandPos);
+            minionRefactor(currentPlayer, 0, 1, &state, randomHandPos);
 
             // asserts
 

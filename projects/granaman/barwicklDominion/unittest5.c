@@ -8,7 +8,10 @@
 // Unit tests for Mine card
 
 // initializeGame params: int numPlayers, int kingdomCards[10], int randomSeed, struct gameState *state
-// cardMine params: int currentPlayer, int choice1, int choice2, struct gameState *state, int handPos
+
+// OLD cardMine params: int currentPlayer, int choice1, int choice2, struct gameState *state, int handPos
+// NEW mineRefactor params: int choice1, int choice2, struct gameState *state, int handPos
+
 // choice 1 is the INDEX of card the player wants to trash FROM THEIR HAND
 // choice 2 is the CARD (ie "silver") the player wants to get in exchange for choice1
 // handPos is the position of the mine card itself, the player cannot trade the mine card itself
@@ -42,7 +45,7 @@ void mineTest1() {
     deckCountBefore = state.deckCount[currentPlayer];
 
     // act
-    ret = cardMine(currentPlayer, 1, silver, &state, 0);
+    ret = mineRefactor(currentPlayer, 1, silver, &state, 0);
 
     // assert
     assertEqual("Player is allowed to trade a copper for a silver", ret, 0);
@@ -80,7 +83,7 @@ void mineTest1() {
     deckCountBefore = state.deckCount[currentPlayer];
 
     // act
-    ret = cardMine(currentPlayer, 2, gold, &state, 0);
+    ret = mineRefactor(currentPlayer, 2, gold, &state, 0);
 
     // assert
     assertEqual("Player is allowed to trade a silver for a gold", ret, 0);
@@ -115,7 +118,7 @@ void mineTest1() {
     state.hand[currentPlayer][3] = gold;
 
     // lateral trade - gold
-    ret = cardMine(currentPlayer, 3, gold, &state, 0);
+    ret = mineRefactor(currentPlayer, 3, gold, &state, 0);
     assertEqual("[MY BUG] Player is allowed to make a lateral trade (gold for gold)", ret, 0);
 
     goldCount = 0;
@@ -128,7 +131,7 @@ void mineTest1() {
     assertEqual("Player's hand still contains a gold card", goldCount, 1);
 
     // lateral trade - silver
-    ret = cardMine(currentPlayer, 2, silver, &state, 0);
+    ret = mineRefactor(currentPlayer, 2, silver, &state, 0);
     assertEqual("[Player is allowed to make a lateral trade (silver for silver)", ret, 0);
 
     silverCount = 0;
@@ -141,7 +144,7 @@ void mineTest1() {
     assertEqual("Player's hand still contains a silver card", silverCount, 1);
 
     // lateral trade - copper
-    ret = cardMine(currentPlayer, 1, copper, &state, 0);
+    ret = mineRefactor(currentPlayer, 1, copper, &state, 0);
     assertEqual("[layer is allowed to make a lateral trade (copper for copper)", ret, 0);
 
     copperCount = 0;
@@ -161,7 +164,7 @@ void mineTest1() {
     state.hand[currentPlayer][3] = gold;
 
     // downgrade trade - gold to silver
-    ret = cardMine(currentPlayer, 3, silver, &state, 0);
+    ret = mineRefactor(currentPlayer, 3, silver, &state, 0);
     assertEqual("[MY BUG] Player is allowed to trade down (gold for a silver)", ret, 0);
 
     silverCount = 0;
@@ -174,7 +177,7 @@ void mineTest1() {
     assertEqual("Player's hand now contains a silver card", silverCount, 1);
 
     // downgrade trade - silver to copper
-    ret = cardMine(currentPlayer, 3, silver, &state, 0);
+    ret = mineRefactor(currentPlayer, 3, silver, &state, 0);
     assertEqual("[EXISTING BUG] Player is allowed to trade down (silver for a copper)", ret, 0);
 
     copperCount = 0;
@@ -209,13 +212,13 @@ void mineTest2() {
     int deckCountBefore, coinsBefore, numActionsBefore, handCountBefore;
 
     // act and assert
-    ret = cardMine(currentPlayer, 1, silver, &state, 0);
+    ret = mineRefactor(currentPlayer, 1, silver, &state, 0);
     assertEqual("Player is prevented from trading a province for a silver", ret, -1);
 
-    ret = cardMine(currentPlayer, 2, silver, &state, 0);
+    ret = mineRefactor(currentPlayer, 2, silver, &state, 0);
     assertEqual("Player is prevented from trading a adventurer for a silver", ret, -1);
 
-    ret = cardMine(currentPlayer, 3, curse, &state, 0);
+    ret = mineRefactor(currentPlayer, 3, curse, &state, 0);
     assertEqual("Player is prevented from trading a curse for a silver", ret, -1);
 
     // arrange again, this time with good cards in-hand but this time,
@@ -230,21 +233,21 @@ void mineTest2() {
     // act and assert
     // note: these tests and the functionality they test will break if someone
     // changes the order of cards in the enum list in dominion.h
-    ret = cardMine(currentPlayer, 1, province, &state, 0);
+    ret = mineRefactor(currentPlayer, 1, province, &state, 0);
     assertEqual("Player is prevented from trading a copper for a province", ret, -1);
 
-    ret = cardMine(currentPlayer, 1, treasure_map, &state, 0);
+    ret = mineRefactor(currentPlayer, 1, treasure_map, &state, 0);
     assertEqual("Player is prevented from trading a silver for a treasure map", ret, -1);
 
-    ret = cardMine(currentPlayer, 3, province, &state, 0);
+    ret = mineRefactor(currentPlayer, 3, province, &state, 0);
     assertEqual("Player is prevented from trading a gold for an adventurer", ret, -1);
 
     int negativeCard = -1;
-    ret = cardMine(currentPlayer, 1, negativeCard, &state, 0);
+    ret = mineRefactor(currentPlayer, 1, negativeCard, &state, 0);
     assertEqual("Player is prevented from trading a copper for a card that does not exist (low end)", ret, -1);
 
     int outOfBoundsCard = 27;
-    ret = cardMine(currentPlayer, 1, outOfBoundsCard, &state, 0);
+    ret = mineRefactor(currentPlayer, 1, outOfBoundsCard, &state, 0);
     assertEqual("Player is prevented from trading a copper for a card that does not exist (high end)", ret, -1);
 }
 

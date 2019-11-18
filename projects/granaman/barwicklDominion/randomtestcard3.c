@@ -10,7 +10,9 @@
 // Random tests for Tribute card
 
 // initializeGame params: int numPlayers, int kingdomCards[10], int randomSeed, struct gameState *state
-// cardTribute params: int currentPlayer, struct gameState *state
+
+// OLD cardTribute params: int currentPlayer, struct gameState *state
+// NEW tributeRefactor params: struct gameState *state, int handPos
 
 void randomTestCard3b() {
     // tests that every card's type is properly returned
@@ -109,7 +111,7 @@ void randomTestCard3() {
         printf("* Opponent is player %d: They have %d cards in hand; %d cards in deck; %d cards in discard pile\n", pLeft, state.handCount[pLeft], state.deckCount[pLeft], state.discardCount[pLeft]);
 
         // act
-        cardTribute(currentPlayer, &state);
+        tributeRefactor(currentPlayer, &state);
 
         // assert
         if (opponentCardCount >= 2) {

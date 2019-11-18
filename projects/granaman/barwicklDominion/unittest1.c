@@ -9,7 +9,9 @@
 
 // initializeGame params: int numPlayers, int kingdomCards[10], int randomSeed, struct gameState *state
 
-// cardBaron params: numPlayer, choice1, state
+// OLD cardBaron params: numPlayer, choice1, state
+// NEW baronRefactor params: int card, int choice1, struct gameState *state
+
 // choice1 is 1 = discard an estate or gain an estate
 // choice1 is 0 = gain an estate (if there are any available)
 
@@ -28,7 +30,7 @@ void baronTest1a() {
 
     // act
     // passing a zero as the second param indicates user wants to gain an estate
-    cardBaron(currentPlayer, 0, &state);
+    baronRefactor(currentPlayer, 0, &state);
 
     // assert
 
@@ -74,7 +76,7 @@ void baronTest1b() {
 
     // act
     // passing a zero as the second param indicates user wants to gain an estate
-    cardBaron(currentPlayer, 0, &state);
+    baronRefactor(currentPlayer, 0, &state);
 
     // assert
     // verify that the player did not get an estate card
@@ -131,7 +133,7 @@ void baronTest2a() {
 
     // act
     // passing a 1 as the middle param indicates user wants to trade an estate for 4 gold
-    cardBaron(currentPlayer, 1, &state);
+    baronRefactor(currentPlayer, 1, &state);
 
     // assert
 
@@ -187,11 +189,11 @@ void baronTest2b1() {
 
     // act
     // passing a 1 as the middle param indicates user wants to trade an estate for 4 gold
-    cardBaron(currentPlayer, 1, &state);
+    baronRefactor(currentPlayer, 1, &state);
 
     // assert
     // verify that the player gained one estate card and the supply pile lost one estate
-    // FAILS because supply count is being decreased twice, once in cardBaron and once in gainCard
+    // FAILS because supply count is being decreased twice, once in baronRefactor and once in gainCard
     assertDecreasedByOne("[EXISTING BUG] Estate supply pile count decreased by 1", estateSupplyBefore, state.supplyCount[estate]);
 
         // verify that the player didn't gain or lose any other cards in their hand
@@ -232,7 +234,7 @@ void baronTest2b2() {
     // act
     // passing a 1 as the second param indicates user wants to trade an estate for 4 gold
     // but in this case the player does not have an estate, nor does the supply pile
-    cardBaron(currentPlayer, 1, &state);
+    baronRefactor(currentPlayer, 1, &state);
 
     // assert
     // verify that the player did not get an estate card

@@ -10,7 +10,9 @@
 
 // initializeGame params: int numPlayers, int kingdomCards[10], int randomSeed, struct gameState *state
 
-// cardBaron params: numPlayer, choice1, state
+// OLD cardBaron params: numPlayer, choice1, state
+// NEW baronRefactor params: int card, int choice1, struct gameState *state
+
 // choice1 is 0 = gain an estate (if there are any available)
 // choice1 is 1 = discard an estate for +4 coins or gain an estate if you don't have one
 
@@ -33,7 +35,7 @@ void randomTestCard1() {
     // randomize the size, cards of the player's discard pile
     // randomize the quantity of estates in the estate pile
 
-    // cardBaron only returns 0, never -1
+    // baronRefactor only returns 0, never -1
     // must test "failure" states some other way
 
     // use these to track that we've encountered each scenario a sufficient amount of times
@@ -85,7 +87,7 @@ void randomTestCard1() {
 
         // act - if choice1 is 1, trade an estate (from hand) for +4 coins
         //       if choice1 is 0, draw an estate
-        cardBaron(currentPlayer, choice1, &state);
+        baronRefactor(currentPlayer, choice1, &state);
 
         if (choice1 == 1) {
             printf("Baron Random Test [Option 1: Discard an estate card for +4 coins]\nIteration #%d, hand count: %d, discard count: %d, estate supply pile: %d, estates in hand: %d \n", iteration, randomHandCount, discardCountBefore, estateSupplyCountBefore, estateHandCountBefore);
