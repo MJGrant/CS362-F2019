@@ -603,6 +603,7 @@ int drawCard(int player, struct gameState *state)
     }
 
     else {
+        // deck is not empty
         int count = state->handCount[player];//Get current hand count for player
         int deckCounter;
         if (DEBUG) { //Debug statements
@@ -610,6 +611,7 @@ int drawCard(int player, struct gameState *state)
         }
 
         deckCounter = state->deckCount[player];//Create holder for the deck count
+
         state->hand[player][count] = state->deck[player][deckCounter - 1];//Add card to the hand
         state->deckCount[player]--;
         state->handCount[player]++;//Increment hand count
@@ -755,9 +757,10 @@ int minionRefactor(int choice1, int choice2, struct gameState *state, int handPo
     else if (choice2)
     {
         //discard hand
+
         while(numHandCards(state) > 0)
         {
-            discardCard(handPos, currentPlayer, state, 0);
+           discardCard(handPos, currentPlayer, state, 0);
         }
 
         //draw 4
@@ -768,21 +771,28 @@ int minionRefactor(int choice1, int choice2, struct gameState *state, int handPo
 
         //other players discard hand and redraw if hand size > 4
         for (i = 0; i < state->numPlayers; i++)
+            printf("numPlayers is: %d\n", state->numPlayers);
         {
             if (i != currentPlayer)
             {
                 if ( state->handCount[i] >= 4 )
                 {
+                    printf("Player %d has more 4+ cards, discarding their hand\n", i);
                     //discard hand
+
                     while( state->handCount[i] > 0 )
                     {
                         discardCard(handPos, i, state, 0);
                     }
 
                     //draw 4
+                    // old way: drawCard's first param is the player number,
+                    //so passing j as the first param is causing cards to be
+                    // drawn for players who don't exist
+                    // pass i as the first param instead, i represents the player number
                     for (j = 0; j < 4; j++)
                     {
-                        drawCard(j, state);
+                        drawCard(i, state); // the first param is the player number
                     }
                 }
             }
