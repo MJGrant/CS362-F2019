@@ -28,6 +28,7 @@ void mineTest1() {
     int k[10] = {1,2,3,4,5,6,7,8,9,10};
     int currentPlayer = 1;
     initializeGame(2, k, 2, &state);
+    state.whoseTurn = currentPlayer;
     int ret;
 
     int deckCountBefore, handCountBefore;

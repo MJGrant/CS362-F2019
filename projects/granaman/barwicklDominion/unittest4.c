@@ -25,6 +25,7 @@ void tributeTest1() {
     int opponent = 0;
     int currentPlayer = 1;
     initializeGame(2, k, 2, &state);
+    state.whoseTurn = currentPlayer;
 
     int deckCountBefore, coinsBefore, numActionsBefore, handCountBefore;
 

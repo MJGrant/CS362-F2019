@@ -31,6 +31,7 @@ void randomTestCard2() {
         int k[10] = {1,2,3,4,5,6,7,8,9,10};
         int numPlayers = getRandomNumberOfPlayers();
         int currentPlayer = rand() % numPlayers; // random between 0 and numPlayers
+        state.whoseTurn = currentPlayer;
 
         initializeGame(numPlayers, k, 2, &state);
 

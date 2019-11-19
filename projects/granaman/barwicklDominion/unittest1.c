@@ -23,6 +23,7 @@ void baronTest1a() {
     int k[10] = {1,2,3,4,5,6,7,8,9,10};
     int currentPlayer = 1;
     initializeGame(2, k, 2, &state);
+    state.whoseTurn = currentPlayer;
 
     int discardCountBefore = state.discardCount[currentPlayer];
     int numBuysBefore = state.numBuys; // save: numBuys
@@ -61,6 +62,7 @@ void baronTest1b() {
     int k[10] = {1,2,3,4,5,6,7,8,9,10};
     int currentPlayer = 1;
     initializeGame(2, k, 2, &state);
+    state.whoseTurn = currentPlayer;
 
     int coinsBefore = state.coins;
     int discardCountBefore = state.discardCount[currentPlayer];
@@ -123,6 +125,7 @@ void baronTest2a() {
     int k[10] = {1,2,3,4,5,6,7,8,9,10};
     int currentPlayer = 1;
     initializeGame(2, k, 2, &state);
+    state.whoseTurn = currentPlayer;
 
     // set the player's hand to a specific arrangement of cards
     state.handCount[currentPlayer] = 4;
@@ -181,6 +184,7 @@ void baronTest2b1() {
     int k[10] = {1,2,3,4,5,6,7,8,9,10};
     int currentPlayer = 1;
     initializeGame(2, k, 2, &state);
+    state.whoseTurn = currentPlayer;
 
     // set the player's hand to a specific arrangement of cards
     // player doesn't have any estate cards
@@ -226,6 +230,7 @@ void baronTest2b2() {
     int k[10] = {1,2,3,4,5,6,7,8,9,10};
     int currentPlayer = 1;
     initializeGame(2, k, 2, &state);
+    state.whoseTurn = currentPlayer;
 
     // set the player's hand to a specific arrangement of cards
     // player doesn't have any estate cards

@@ -70,6 +70,7 @@ void randomTestCard3() {
         int numPlayers = getRandomNumberOfPlayers();
 
         initializeGame(numPlayers, k, 2, &state);
+        state.whoseTurn = currentPlayer;
 
         state.coins = rand() % 101; // starting coins between 0 and 100
 

@@ -22,8 +22,9 @@ void minionTest1a() {
     // arrange
     struct gameState state;
     int k[10] = {1,2,3,4,5,6,7,8,9,10};
+    int currentPlayer = 0;
     initializeGame(2, k, 2, &state);
-    int currentPlayer = whoseTurn(&state);
+    state.whoseTurn = currentPlayer;
 
     int discardCountBefore = state.discardCount[currentPlayer];
     int numActionsBefore = state.numActions;
@@ -75,8 +76,9 @@ void minionTest2a() {
     // arrange
     struct gameState state;
     int k[10] = {1,2,3,4,5,6,7,8,9,10};
+    int currentPlayer = 0;
     initializeGame(2, k, 2, &state);
-    int currentPlayer = whoseTurn(&state);
+    state.whoseTurn = currentPlayer;
 
     int discardCountBefore = state.discardCount[currentPlayer];
     int numActionsBefore = state.numActions;
@@ -134,7 +136,9 @@ void minionTest2b() {
     // arrange
     struct gameState state;
     int k[10] = {1,2,3,4,5,6,7,8,9,10};
+    int currentPlayer = 0;
     initializeGame(2, k, 2, &state);
+    state.whoseTurn = currentPlayer;
 
     // this test just looks at the state of the opponent's hand when the opponent only went into this round with
     // 3 cards in hand
