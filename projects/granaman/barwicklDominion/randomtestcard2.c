@@ -48,6 +48,7 @@ void randomTestCard2() {
         // randomize the position of the tribute card in the player's hand
         int randomHandPos = insertCardIntoHandAtRandomPosition(&state, currentPlayer, randomHandCount, minion);
         int discardCountBefore = state.discardCount[currentPlayer];
+        int deckCountBefore = state.deckCount[currentPlayer];
         int coinsBefore = state.coins;
 
         // record player hand sizes
@@ -62,7 +63,7 @@ void randomTestCard2() {
 
         if (choice == 1) {
             // act
-            printf("Minion Random Test [Option 1: Gain +2 coins]\nIteration #%d, # players: %d, hand count: %d, hand pos: %d, discard count: %d, current player: %d \n", iteration, numPlayers, randomHandCount, randomHandPos, discardCountBefore, currentPlayer);
+            printf("Minion Random Test [Option 1: Gain +2 coins]\nIteration #%d, # players: %d, current player: %d, hand count: %d, hand pos: %d, discard count: %d, deck count: %d \n", iteration, numPlayers, currentPlayer, randomHandCount, randomHandPos, discardCountBefore, deckCountBefore);
             minionRefactor(1, 0, &state, randomHandPos);
 
             //assert
@@ -79,7 +80,7 @@ void randomTestCard2() {
             choice1PlayerGained2Coins++;
         } else if (choice == 2) {
             // act - choice1 is 0, take an estate (if one exists in the supply)
-            printf("Minion Random Test [Option 2: Discard hand, draw 4, opponents do the same]\nIteration #%d, # players: %d, hand count: %d, hand pos: %d, discard count: %d, current player: %d \n", iteration, numPlayers, randomHandCount, randomHandPos, discardCountBefore, currentPlayer);
+            printf("Minion Random Test [Option 2: Discard hand, draw 4, opponents do the same]\nIteration #%d, # players: %d,  current player: %d, hand count: %d, hand pos: %d, discard count: %d, deck count: %d \n", iteration, numPlayers, currentPlayer, randomHandCount, randomHandPos, discardCountBefore, deckCountBefore);
             minionRefactor(0, 1, &state, randomHandPos);
 
             // asserts
