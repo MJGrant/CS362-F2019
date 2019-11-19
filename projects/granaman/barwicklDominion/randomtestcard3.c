@@ -82,7 +82,7 @@ void randomTestCard3() {
         }
 
         // randomize the position of the tribute card in the player's hand
-        insertCardIntoHandAtRandomPosition(&state, currentPlayer, randomHandCount, tribute);
+        int randomHandPos = insertCardIntoHandAtRandomPosition(&state, currentPlayer, randomHandCount, tribute);
 
         int coinsBefore = state.coins;
         int numActionsBefore = state.numActions;
@@ -111,7 +111,7 @@ void randomTestCard3() {
         printf("* Opponent is player %d: They have %d cards in hand; %d cards in deck; %d cards in discard pile\n", pLeft, state.handCount[pLeft], state.deckCount[pLeft], state.discardCount[pLeft]);
 
         // act
-        tributeRefactor(currentPlayer, &state);
+        tributeRefactor(&state, randomHandPos);
 
         // assert
         if (opponentCardCount >= 2) {

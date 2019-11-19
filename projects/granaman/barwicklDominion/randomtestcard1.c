@@ -87,7 +87,9 @@ void randomTestCard1() {
 
         // act - if choice1 is 1, trade an estate (from hand) for +4 coins
         //       if choice1 is 0, draw an estate
-        baronRefactor(currentPlayer, choice1, &state);
+        // cardBaron(currentPlayer, choice1, &state);
+        // note: the first param doesn't seem to do anything
+        baronRefactor(copper, 0, &state);
 
         if (choice1 == 1) {
             printf("Baron Random Test [Option 1: Discard an estate card for +4 coins]\nIteration #%d, hand count: %d, discard count: %d, estate supply pile: %d, estates in hand: %d \n", iteration, randomHandCount, discardCountBefore, estateSupplyCountBefore, estateHandCountBefore);
