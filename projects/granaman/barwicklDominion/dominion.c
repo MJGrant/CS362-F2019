@@ -717,7 +717,7 @@ int baronRefactor(int card, int choice1, struct gameState *state){
             }
 
             else {
-                //p++;//Next card
+                p++;//Next card
             }
         }
     }
