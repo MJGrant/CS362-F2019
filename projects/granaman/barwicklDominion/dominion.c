@@ -802,14 +802,14 @@ int ambassadorRefactor(int choice1, int choice2, struct gameState *state, int ha
         return -1;
     }
 
-    if (choice1 == handPos)
+    if (choice1 == state->hand[currentPlayer][handPos])
     {
         return -1;
     }
 
     for (i = 0; i < state->handCount[currentPlayer]; i++)
     {
-        if (i != handPos && i == state->hand[currentPlayer][choice1] && i != choice1)
+        if (state->hand[currentPlayer][i] == choice1)
         {
             j++;
         }
