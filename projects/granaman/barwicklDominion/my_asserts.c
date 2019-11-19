@@ -49,5 +49,12 @@ void assertAtLeast(char *testName, int atLeastThisMuch, int valueToCheck) {
     } else if (valueToCheck < atLeastThisMuch) {
         printf("x -- %s [FAILED!] %d was expected to be at least %d.\n", testName, valueToCheck, atLeastThisMuch);
     }
+}
 
+void assertAtMost(char *testName, int valueToCheck, int atMostThisMuch) {
+    if (valueToCheck <= atMostThisMuch) {
+        printf("✔ -- %s [Passed] %d is less than or equal to %d.\n", testName, valueToCheck, atMostThisMuch);
+    } else if (valueToCheck > atMostThisMuch) {
+        printf("x -- %s [FAILED!] %d was expected to be at most %d.\n", testName, valueToCheck, atMostThisMuch);
+    }
 }
