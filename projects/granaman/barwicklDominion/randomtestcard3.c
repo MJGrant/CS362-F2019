@@ -122,11 +122,22 @@ void randomTestCard3() {
             // verify that the opponent has two cards in the discard pile
             int card1 = state.discard[pLeft][state.discardCount[pLeft]-1];
             int card2 = state.discard[pLeft][state.discardCount[pLeft]-2];
-            assertAtLeast("Opponent's top discard card is valid", 0, card1);
-            assertAtLeast("Opponent's second-to-top discard card is valid", 0, card2);
+            assertAtLeast("Opponent's top discard card is valid (not a negative value)", 0, card1);
+            assertAtLeast("Opponent's second-to-top discard card is valid (not a negative value)", 0, card2);
 
-            cardTracker1[card1] = 1;
-            cardTracker2[card2] = 1;
+            assertAtMost("Opponent's top discard card is valid (not outside the upper boundary)", card1, 26);
+            assertAtMost("Opponent's second-to-top discard card is valid (not outside the upper boundary)", card2, 26);
+
+            printf("card1 is: %d\n", card1);
+            printf("card2 is: %d\n", card2);
+
+            if (card1 >= 0 && card1 <= 26) {
+                cardTracker1[card1] = 1;
+            }
+
+            if (card2 >= 0 && card2 <= 26) {
+                cardTracker2[card2] = 1;
+            }
 
             int cardType1 = getCardType(card1);
             int cardType2 = getCardType(card2);
@@ -258,14 +269,18 @@ void randomTestCard3() {
                 printf("1 or more cards is an unhandled type!\n");
             }
         } else if (opponentCardCount == 1) {
+
             // opponent only had one card (1 in deck or 1 in discard pile and 0 in the other)
             // that card was revealed and discarded
             int card1 = state.discard[pLeft][state.discardCount[pLeft]-1];
+            assertAtLeast("Opponent's top discard card is valid (not less than 0)", 0, card1);
+            assertAtMost("Opponent's top discard card is valid (not outside the upper boundary)", card1, 26);
 
-            cardTracker1[card1] = 1;
+            if (card1 >= 0 && card1 <= 26) {
+                cardTracker1[card1] = 1;
+            }
 
             assertAtLeast("Opponent has at least 1 card in discard pile now", 1, state.discardCount[pLeft]);
-            assertAtLeast("Opponent's top discard card is valid", 0, state.discardCount[pLeft]);
 
             int cardType1 = getCardType(card1);
             if (cardType1 == 1) {
@@ -299,7 +314,7 @@ void randomTestCard3() {
                 assertEqual("[Curse Card alone] player gained no coins", coinsBefore, state.coins);
                 everyCombination[20] = 1;
             } else {
-                //printf("Card is an unhandled type!\n");
+                printf("Card is an unhandled type!\n");
             }
 
         } else if (opponentCardCount == 0) {
