@@ -145,7 +145,7 @@ void baronTest2a() {
     //baronRefactor(currentPlayer, 1, &state);
 
     // note: the first param doesn't seem to do anything
-    baronRefactor(copper, 0, &state);
+    baronRefactor(copper, 1, &state);
 
     // assert
 
@@ -205,7 +205,7 @@ void baronTest2b1() {
     // cardBaron(currentPlayer, 1, &state);
 
     // note: the first param doesn't seem to do anything
-    baronRefactor(copper, 0, &state);
+    baronRefactor(copper, 1, &state);
 
     // assert
     // verify that the player gained one estate card and the supply pile lost one estate
@@ -254,7 +254,7 @@ void baronTest2b2() {
     // cardBaron(currentPlayer, 1, &state);
 
     // note: the first param doesn't seem to do anything
-    baronRefactor(copper, 0, &state);
+    baronRefactor(copper, 1, &state);
 
     // assert
     // verify that the player did not get an estate card
