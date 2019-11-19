@@ -37,7 +37,8 @@ void tributeTest1() {
     numActionsBefore = state.numActions;
 
     // act
-    tributeRefactor(1, &state);
+    // cardTribute(1, &state);
+    tributeRefactor(&state, 0);
 
     // assert two actions were gained
     assertEqual("[MY BUG] Opponent revealed 2 action cards, player gained +2 actions", numActionsBefore+2, state.numActions);
@@ -52,7 +53,7 @@ void tributeTest1() {
     coinsBefore = state.coins;
 
     // act
-    tributeRefactor(1, &state);
+    tributeRefactor(&state, 0);
 
     // assert two coins were gained
     assertEqual("[MY BUG] Opponent revealed 2 treasure cards, player gained +2 coins", coinsBefore+2, state.coins);
@@ -67,7 +68,7 @@ void tributeTest1() {
     handCountBefore = state.handCount[currentPlayer];
 
     // act
-    tributeRefactor(1, &state);
+    tributeRefactor(&state, 0);
 
     // assert two cards were drawn from player's own deck
     assertEqual("[MY BUG]  Opponent revealed 2 victory cards, player drew +2 cards from their own deck", deckCountBefore+2, state.deckCount[currentPlayer]);
@@ -86,7 +87,7 @@ void tributeTest1() {
     deckCountBefore = state.deckCount[currentPlayer];
 
     // act
-    tributeRefactor(1, &state);
+    tributeRefactor(&state, 0);
 
     // assert nothing was gained
     // first one fails because curse cards are incorrectly treated as actions in the code
@@ -105,7 +106,7 @@ void tributeTest1() {
     coinsBefore = state.coins;
 
     // act
-    tributeRefactor(1, &state);
+    tributeRefactor(&state, 0);
 
     // assert two actions were gained and two coins were gained
     assertEqual("Opponent revealed 1 action card, player gained +2 actions", numActionsBefore+2, state.numActions);
@@ -123,7 +124,7 @@ void tributeTest1() {
     handCountBefore = state.handCount[currentPlayer];
 
     // act
-    tributeRefactor(1, &state);
+    tributeRefactor(&state, 0);
 
     // assert two actions were gained and two coins were gained
     assertEqual("Opponent revealed 1 action card, player gained +2 actions", numActionsBefore+2, state.numActions);
@@ -143,7 +144,7 @@ void tributeTest1() {
     handCountBefore = state.handCount[currentPlayer];
 
     // act
-    tributeRefactor(1, &state);
+    tributeRefactor(&state, 0);
 
     // assert two actions were gained from the action card but nothing changed from the curse card
     assertEqual("Opponent revealed 1 action card, player gained +2 actions", numActionsBefore+2, state.numActions);
@@ -162,7 +163,7 @@ void tributeTest1() {
     handCountBefore = state.handCount[currentPlayer];
 
     // act
-    tributeRefactor(1, &state);
+    tributeRefactor(&state, 0);
 
     // assert two coins were gained from the treasure card and 2 cards were drawn for the victory card
     assertEqual("Opponent revealed 1 treasure cards, player gained +2 coins", coinsBefore+2, state.coins);
@@ -182,7 +183,7 @@ void tributeTest1() {
     handCountBefore = state.handCount[currentPlayer];
 
     // act
-    tributeRefactor(1, &state);
+    tributeRefactor(&state, 0);
 
     // assert two cards were gained from the victory card and nothing else changed from the curse card
     assertEqual("Opponent revealed 1 treasure card, player gained +2 coins", coinsBefore+2, state.coins);
@@ -202,7 +203,7 @@ void tributeTest1() {
     int opponentDiscardCountBefore = state.discardCount[opponent];
 
     // act
-    tributeRefactor(1, &state);
+    tributeRefactor(&state, 0);
 
     // assert two cards were gained from the victory card and nothing else changed from the curse card
     assertEqual("Opponent revealed 1 victory card, player drew +2 cards from their own deck", deckCountBefore+2, state.deckCount[currentPlayer]);
@@ -225,7 +226,7 @@ void tributeTest1() {
     handCountBefore = state.handCount[currentPlayer];
 
     // act
-    tributeRefactor(1, &state);
+    tributeRefactor(&state, 0);
 
     // assert two actions were gained and two coins were gained
     assertEqual("Opponent revealed 1 action card, player gained +2 actions", numActionsBefore+2, state.numActions);
@@ -265,7 +266,7 @@ void tributeTest2() {
     handCountBefore = state.handCount[currentPlayer];
 
     // act
-    tributeRefactor(1, &state);
+    tributeRefactor(&state, 0);
 
     // assert two cards were gained from the victory card and nothing else changed from the curse card
     assertEqual("Opponent revealed 1 victory card, player drew +2 cards from their own deck", deckCountBefore+2, state.deckCount[currentPlayer]);
@@ -294,7 +295,7 @@ void tributeTest2() {
     handCountBefore = state.handCount[currentPlayer];
 
     // act
-    tributeRefactor(1, &state);
+    tributeRefactor(&state, 0);
 
     // assert two cards were gained from the victory card and nothing else changed from the curse card
     assertEqual("Opponent revealed 1 victory card, player drew +2 cards from their own deck", deckCountBefore+2, state.deckCount[currentPlayer]);
@@ -323,7 +324,7 @@ void tributeTest2() {
     opponentDiscardCountBefore = 0;
 
     // act
-    tributeRefactor(1, &state);
+    tributeRefactor(&state, 0);
 
     // assert two coins were gained and nothing else changed
     assertEqual("Opponent revealed 1 treasure card, player gains +2 coins", coinsBefore+2, state.coins);
@@ -353,7 +354,7 @@ void tributeTest2() {
     opponentDiscardCountBefore = 0;
 
     // act
-    tributeRefactor(1, &state);
+    tributeRefactor(&state, 0);
 
     // assert two coins were gained and nothing else changed
     assertEqual("Opponent revealed 1 treasure card, player gains +2 coins", coinsBefore+2, state.coins);
@@ -378,7 +379,7 @@ void tributeTest2() {
     handCountBefore = state.handCount[currentPlayer];
 
     // act
-    tributeRefactor(1, &state);
+    tributeRefactor(&state, 0);
 
     // assert two cards were gained from the victory card and nothing else changed from the curse card
     assertEqual("Opponent has no cards, player gained no actions", numActionsBefore, state.numActions);
@@ -412,7 +413,7 @@ void tributeTest3() {
     int opponentDiscardCountBefore = state.discardCount[opponent];
 
     // act
-    tributeRefactor(1, &state);
+    tributeRefactor(&state, 0);
 
     // assert two coins were gained from the treasure card and 2 cards were drawn for the victory card
     // verifies that current player experienced these changes and opponent did not

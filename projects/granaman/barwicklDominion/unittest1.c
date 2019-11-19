@@ -30,7 +30,11 @@ void baronTest1a() {
 
     // act
     // passing a zero as the second param indicates user wants to gain an estate
-    baronRefactor(currentPlayer, 0, &state);
+    // cardBaron(currentPlayer, 0, &state);
+
+    // NEW baronRefactor params: int card, int choice1, struct gameState *state
+    // note: the first param doesn't seem to be used for anything so I'll just pass copper...
+    baronRefactor(copper, 0, &state);
 
     // assert
 
@@ -76,7 +80,9 @@ void baronTest1b() {
 
     // act
     // passing a zero as the second param indicates user wants to gain an estate
-    baronRefactor(currentPlayer, 0, &state);
+    // cardBaron(currentPlayer, 0, &state);
+    // note: the first param doesn't seem to do anything
+    baronRefactor(copper, 0, &state);
 
     // assert
     // verify that the player did not get an estate card
@@ -133,7 +139,10 @@ void baronTest2a() {
 
     // act
     // passing a 1 as the middle param indicates user wants to trade an estate for 4 gold
-    baronRefactor(currentPlayer, 1, &state);
+    //baronRefactor(currentPlayer, 1, &state);
+
+    // note: the first param doesn't seem to do anything
+    baronRefactor(copper, 0, &state);
 
     // assert
 
@@ -189,7 +198,10 @@ void baronTest2b1() {
 
     // act
     // passing a 1 as the middle param indicates user wants to trade an estate for 4 gold
-    baronRefactor(currentPlayer, 1, &state);
+    // cardBaron(currentPlayer, 1, &state);
+
+    // note: the first param doesn't seem to do anything
+    baronRefactor(copper, 0, &state);
 
     // assert
     // verify that the player gained one estate card and the supply pile lost one estate
@@ -234,7 +246,10 @@ void baronTest2b2() {
     // act
     // passing a 1 as the second param indicates user wants to trade an estate for 4 gold
     // but in this case the player does not have an estate, nor does the supply pile
-    baronRefactor(currentPlayer, 1, &state);
+    // cardBaron(currentPlayer, 1, &state);
+
+    // note: the first param doesn't seem to do anything
+    baronRefactor(copper, 0, &state);
 
     // assert
     // verify that the player did not get an estate card

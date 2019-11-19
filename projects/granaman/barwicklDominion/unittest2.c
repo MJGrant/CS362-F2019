@@ -22,8 +22,8 @@ void minionTest1a() {
     // arrange
     struct gameState state;
     int k[10] = {1,2,3,4,5,6,7,8,9,10};
-    int currentPlayer = 1;
     initializeGame(2, k, 2, &state);
+    int currentPlayer = whoseTurn(&state);
 
     int discardCountBefore = state.discardCount[currentPlayer];
     int numActionsBefore = state.numActions;
@@ -40,7 +40,8 @@ void minionTest1a() {
     // act
     // set choice1 (2nd param) to 1 (true) to use the "get 2 coins" card option
     // last param is "handPos", the position of the minion card in the player's hand
-    minionRefactor(currentPlayer, 1, 0, &state, 1);
+    // cardMinion(currentPlayer, 1, 0, &state, 1);
+    minionRefactor(1, 0, &state, 1);
 
     // assert
     assertIncreasedByOne("The player gained an action", numActionsBefore, state.numActions);
@@ -74,8 +75,8 @@ void minionTest2a() {
     // arrange
     struct gameState state;
     int k[10] = {1,2,3,4,5,6,7,8,9,10};
-    int currentPlayer = 1;
     initializeGame(2, k, 2, &state);
+    int currentPlayer = whoseTurn(&state);
 
     int discardCountBefore = state.discardCount[currentPlayer];
     int numActionsBefore = state.numActions;
@@ -101,7 +102,7 @@ void minionTest2a() {
     // act
     // set choice1 (2nd param) to 1 (true) to use the "get 2 coins" card option
     // last param is "handPos", the position of the minion card in the player's hand
-    minionRefactor(currentPlayer, 0, 1, &state, 1);
+    minionRefactor(0, 1, &state, 1);
 
     // assert
     assertIncreasedByOne("The player gained an action", numActionsBefore, state.numActions);
@@ -133,9 +134,7 @@ void minionTest2b() {
     // arrange
     struct gameState state;
     int k[10] = {1,2,3,4,5,6,7,8,9,10};
-    int currentPlayer = 1;
     initializeGame(2, k, 2, &state);
-
 
     // this test just looks at the state of the opponent's hand when the opponent only went into this round with
     // 3 cards in hand
@@ -143,7 +142,7 @@ void minionTest2b() {
     state.handCount[0] = 3;
 
     // act
-    minionRefactor(currentPlayer, 0, 1, &state, 1);
+    minionRefactor(0, 1, &state, 1);
 
     // assert
     assertEqual("Opponent was not forced to re-draw, still has 3 cards in hand", 3, state.handCount[0]);
