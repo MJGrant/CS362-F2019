@@ -31,18 +31,21 @@ void randomTestCard2() {
         int k[10] = {1,2,3,4,5,6,7,8,9,10};
         int numPlayers = getRandomNumberOfPlayers();
         int currentPlayer = rand() % numPlayers; // random between 0 and numPlayers
-        state.whoseTurn = currentPlayer;
 
         initializeGame(numPlayers, k, 2, &state);
+        state.whoseTurn = currentPlayer;
 
         state.coins = rand() % 101; // starting coins between 0 and 100
         int choice = rand() % 2+1; // random between 0-1, shifted to 1-2
 
         // randomize each player's hand count and cards, discard count and cards
         int randomHandCount;
-        for (int i = 1; i < numPlayers; i++) {
+        int randomDiscardCount;
+        for (int i = 0; i < numPlayers; i++) {
             randomHandCount = randomizeHand(&state, i);
-            randomizeDiscard(&state, i);
+            state.handCount[i] = randomHandCount;
+            randomDiscardCount = randomizeDiscard(&state, i);
+            state.discardCount[i] = randomDiscardCount;
         }
 
         // randomize the position of the tribute card in the player's hand
@@ -54,16 +57,20 @@ void randomTestCard2() {
         // record player hand sizes
         int playerHandCountBefore[4] = {0,0,0,0};
         int playerDiscardCountBefore[4] = {0,0,0,0};
+        int playerDeckCountBefore[4] = {0,0,0,0};
         for (int i = 0; i < numPlayers; i++) {
             playerHandCountBefore[i] = state.handCount[i];
             playerDiscardCountBefore[i] = state.discardCount[i];
+            playerDeckCountBefore[i] = state.deckCount[i];
         }
+
+        printf("Player 0 hand count before: %d\n", playerHandCountBefore[0]);
 
         iteration++;
 
         if (choice == 1) {
             // act
-            printf("Minion Random Test [Option 1: Gain +2 coins]\nIteration #%d, # players: %d, current player: %d, hand count: %d, hand pos: %d, discard count: %d, deck count: %d \n", iteration, numPlayers, currentPlayer, randomHandCount, randomHandPos, discardCountBefore, deckCountBefore);
+            printf("Minion Random Test [Option 1: Gain +2 coins]\nIteration #%d, # players: %d, current player: %d, hand count: %d, hand pos: %d, discard count: %d, deck count: %d \n", iteration, numPlayers, currentPlayer, playerHandCountBefore[currentPlayer], randomHandPos, playerDiscardCountBefore[currentPlayer], playerDeckCountBefore[currentPlayer]);
             minionRefactor(1, 0, &state, randomHandPos);
 
             //assert

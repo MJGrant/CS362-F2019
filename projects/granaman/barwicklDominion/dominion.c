@@ -686,7 +686,7 @@ int getCost(int cardNumber)
 int baronRefactor(int card, int choice1, struct gameState *state){
     int currentPlayer = whoseTurn(state);
 
-    //state->numBuys++;//Increase buys by 1!
+    state->numBuys++;//Increase buys by 1!
     if (choice1 > 0) { //Boolean true or going to discard an estate
         int p = 0;//Iterator for hand!
         int card_not_discarded = 1;//Flag for discard set!
@@ -757,11 +757,14 @@ int minionRefactor(int choice1, int choice2, struct gameState *state, int handPo
     else if (choice2)
     {
         //discard hand
-
-        while(numHandCards(state) > 0)
-        {
-           discardCard(handPos, currentPlayer, state, 0);
+        int handCountBefore = state->handCount[currentPlayer];
+        for (int c = 0; c < handCountBefore; c++) {
+            state->discard[currentPlayer][state->discardCount[currentPlayer]] = state->hand[currentPlayer][c];
+            state->discardCount[currentPlayer]++; // i represents player number here
+            state->hand[currentPlayer][c] = -1;
+            // repeat for however many cards were in the player's hand originally
         }
+        state->handCount[currentPlayer] = 0;
 
         //draw 4
         for (i = 0; i < 4; i++)
@@ -771,19 +774,34 @@ int minionRefactor(int choice1, int choice2, struct gameState *state, int handPo
 
         //other players discard hand and redraw if hand size > 4
         for (i = 0; i < state->numPlayers; i++)
-            printf("numPlayers is: %d\n", state->numPlayers);
         {
             if (i != currentPlayer)
             {
                 if ( state->handCount[i] >= 4 )
                 {
-                    printf("Player %d has more 4+ cards, discarding their hand\n", i);
                     //discard hand
+                    int handCountBefore = state->handCount[i];
 
+                    for (int c = 0; c < handCountBefore; c++) {
+                        // discardCard doesn't actually handle the case where the card is placed
+                        // in the player's disard pile, so I wrote this code to handle
+                        // moving all the player's hand cards to the player's discard pile
+                        // first, copy the card from hand to discard
+                        state->discard[i][state->discardCount[i]] = state->hand[i][c];
+                        // increase discard count
+                        state->discardCount[i]++; // i represents player number here
+                        // and "void" that spot in the hand
+                        state->hand[i][c] = -1;
+                        // repeat for however many cards were in the player's hand originally
+                    }
+                    // then set handCount to 0
+                    state->handCount[i] = 0;
+
+                    /*
                     while( state->handCount[i] > 0 )
                     {
                         discardCard(handPos, i, state, 0);
-                    }
+                    } */
 
                     //draw 4
                     // old way: drawCard's first param is the player number,
