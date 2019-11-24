@@ -36,10 +36,10 @@ void bug1() {
 
     // arrange current player
     state.handCount[currentPlayer] = 4;
-    state.hand[currentPlayer][0] = mine;
-    state.hand[currentPlayer][1] = copper; // pass index 1 as choice1
-    state.hand[currentPlayer][2] = silver;
-    state.hand[currentPlayer][3] = gold;
+    state.hand[currentPlayer][0] = mine; // enum 11
+    state.hand[currentPlayer][1] = copper; // enum 4
+    state.hand[currentPlayer][2] = silver; // enum 5
+    state.hand[currentPlayer][3] = gold; // enum 6
 
     state.discardCount[currentPlayer] = 1;
     state.discard[currentPlayer][0] = duchy;
@@ -110,19 +110,23 @@ void bug1() {
 
     // verify that the copper card is not in anyone's hand, deck, or discard piles
     int passing = 0;
-    int positionsChecked = 0;
+    int checked = 0;
     for (int i = 0; i < NUM_PLAYERS; i++) {
         printf("Checking player %d's hand, deck, and discard piles\n", i);
 
         // verify that totals remained unchanged
-        assertEqual("Player's hand count remains the same", handCountBefore[i], handCountAfter[i]);
+        if (i == currentPlayer) {
+            assertEqual("Player's hand count decreases by one (copper trashed, silver added, mine discarded)", handCountBefore[i]-1, handCountAfter[i]);
+        } else {
+            assertEqual("Player's hand count remains the same", handCountBefore[i], handCountAfter[i]);
+        }
         assertEqual("Player's deck count remains the same", deckCountBefore[i], deckCountAfter[i]);
         assertEqual("Player's discard count remains the same", discardCountBefore[i], discardCountAfter[i]);
 
         // check this player's hand
         for (int j = 0; j < state.handCount[i]; j++) {
             assertNotEqual("Copper card (card #4) not found in hand", state.hand[i][j], copper);
-            positionsChecked++;
+            checked++;
             if (state.hand[i][j] != copper) {
                 passing++;
             }
@@ -131,7 +135,7 @@ void bug1() {
         // check ths player's deck
         for (int j = 0; j < state.deckCount[i]; j++) {
             assertNotEqual("Copper card (card #4) not found in deck", state.deck[i][j], copper);
-            positionsChecked++;
+            checked++;
             if (state.deck[i][j] != copper) {
                 passing++;
             }
@@ -140,27 +144,28 @@ void bug1() {
         // check this player's discard
         for (int j = 0; j < state.discardCount[i]; j++) {
             assertNotEqual("Copper card (card #4) not found in discard pile", state.discard[i][j], copper);
-            positionsChecked++;
+            checked++;
             if (state.discard[i][j] != copper) {
                 passing++;
             }
         }
     }
 
-
     printf("Checking played cards pile for a copper (card #4)\n");
+
     assertEqual("Played cards count remains the same", playedCardCountBefore, playedCardCountAfter);
+
     // also verify it was not played in the played card pile (shared by all players)
     for (int i = 0; i < state.playedCardCount; i++) {
         assertNotEqual("Copper card (card #4) not found in played cards pile", state.playedCards[i], copper);
-        positionsChecked++;
+        checked++;
         if (state.playedCards[i] != copper) {
             passing++;
         }
     }
 
     printf("Final report:\n");
-    assertEqual("Copper card was trashed", positionsChecked, passing);
+    assertEqual("Copper card was trashed", checked, passing);
 
 }
 
