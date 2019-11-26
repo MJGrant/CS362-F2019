@@ -147,7 +147,12 @@ void bug1() {
             assertEqual("Player's hand count remains the same", handCountBefore[i], handCountAfter[i]);
         }
         assertEqual("Player's deck count remains the same", deckCountBefore[i], deckCountAfter[i]);
-        assertEqual("Player's discard count remains the same", discardCountBefore[i], discardCountAfter[i]);
+
+        if (i == currentPlayer) {
+            assertIncreasedByOne("Player's discarded card count increases by 1 (mine card discarded)", discardCountBefore[i], discardCountAfter[i]);
+        } else {
+            assertEqual("Player's discard count remains the same", discardCountBefore[i], discardCountAfter[i]);
+        }
 
         // check this player's hand
         for (int j = 0; j < state.handCount[i]; j++) {
@@ -179,16 +184,18 @@ void bug1() {
 
     printf("Checking played cards pile for a copper (card #4)\n");
 
-    assertEqual("Played cards count remains the same", playedCardCountBefore, playedCardCountAfter);
+    assertIncreasedByOne("Played cards count increases by one", playedCardCountBefore, playedCardCountAfter);
 
-    // also verify it was not played in the played card pile (shared by all players)
+    // verify it was placed in the played card pile (we need to keep record of)
+    int copperCountInPlayed = 0;
     for (int i = 0; i < state.playedCardCount; i++) {
-        assertNotEqual("Copper card (card #4) not found in played cards pile", state.playedCards[i], copper);
-        checked++;
-        if (state.playedCards[i] != copper) {
+        if (state.playedCards[i] == copper) {
+            checked++;
             passing++;
+            copperCountInPlayed++;
         }
     }
+    assertEqual("Copper card (card #4) was found in played cards pile", copperCountInPlayed, 1);
 
     printf("Final report:\n");
     assertEqual("Copper card was trashed", checked, passing);
@@ -511,9 +518,9 @@ int main() {
 
     bug1();
     bug5();
-    bug9();
-    bug11a();
-    bug11b();
+    //bug9();
+    //bug11a();
+    //bug11b();
 
     printf("[unittest_granaman] Test complete\n");
     return 0;
