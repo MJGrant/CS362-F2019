@@ -197,7 +197,7 @@ void bug1() {
 
 void bug5() {
     // bug 5:
-    printTestName("Bug 5 - a", "[Scoring] When calculating player’s final score, all cards in the player's deck are counted");
+    printTestName("Bug 5", "[Scoring] When calculating player’s final score, all cards in the player's deck are counted");
 
     // simulates what happens when there are more cards in the deck than in the discard pile
 
@@ -218,10 +218,10 @@ void bug5() {
 
     state.deckCount[currentPlayer] = 3;
     state.deck[currentPlayer][0] = estate;   // +1 to score
-    state.deck[currentPlayer][2] = duchy;    // +3 to score
-    state.deck[currentPlayer][3] = province; // +6 to score
+    state.deck[currentPlayer][1] = duchy;    // +3 to score
+    state.deck[currentPlayer][2] = province; // +6 to score
 
-    // should sum to 26 but will likely sum to 17 if bug is unfixed
+    // should sum to 26 but will likely sum to 21 if bug is unfixed
     int expectedScore = 26;
 
     // act
