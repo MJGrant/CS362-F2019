@@ -218,8 +218,8 @@ void bug5() {
 
     state.deckCount[currentPlayer] = 3;
     state.deck[currentPlayer][0] = estate;   // +1 to score
-    state.deck[currentPlayer][2] = duchy;    // +3 to score
-    state.deck[currentPlayer][3] = province; // +6 to score
+    state.deck[currentPlayer][1] = duchy;    // +3 to score
+    state.deck[currentPlayer][2] = province; // +6 to score
 
     // should sum to 26 but will likely sum to 17 if bug is unfixed
     int expectedScore = 26;
