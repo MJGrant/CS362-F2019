@@ -825,10 +825,10 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
 
         gainCard(choice2, state, 2, currentPlayer);
 
-        //discard card from hand
-        discardCard(handPos, currentPlayer, state, 0);
+        //discard mine card from hand
+        discardCard(handPos, currentPlayer, state, 1);
 
-        //discard trashed card
+        //trash the treasure card that's being traded in
         for (i = 0; i < state->handCount[currentPlayer]; i++)
         {
             if (state->hand[currentPlayer][i] == j)
@@ -1266,37 +1266,28 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
 int discardCard(int handPos, int currentPlayer, struct gameState *state, int trashFlag)
 {
 
-    //if card is not trashed, added to Played pile
-    if (trashFlag < 1)
-    {
-        //add card to played pile
+
+    if (trashFlag == 0) {
+        // If card is to be trashed, add it to playedCards
         state->playedCards[state->playedCardCount] = state->hand[currentPlayer][handPos];
         state->playedCardCount++;
+    } else if (trashFlag == 1) {
+        // If card is to be discarded, add it to discard pile
+        state->discard[currentPlayer][state->discardCount[currentPlayer]] = state->hand[currentPlayer][handPos];
+        state->discardCount[currentPlayer]++;
     }
 
-    //set played card to -1
+    // Null it out of the player's hand
+    // ie: [1][2][5] becomes [1][-1][5]
     state->hand[currentPlayer][handPos] = -1;
 
-    //remove card from player's hand
-    if ( handPos == (state->handCount[currentPlayer] - 1) ) 	//last card in hand array is played
-    {
-        //reduce number of cards in hand
-        state->handCount[currentPlayer]--;
+    // Finally, fill the gap by moving all cards left to fill it in
+    // ie: [1][-1][5] becomes [1][5]
+    for (int i = handPos; i < state->handCount[currentPlayer]; i++) {
+        state->hand[currentPlayer][i] = state->hand[currentPlayer][i+1];
     }
-    else if ( state->handCount[currentPlayer] == 1 ) //only one card in hand
-    {
-        //reduce number of cards in hand
-        state->handCount[currentPlayer]--;
-    }
-    else
-    {
-        //replace discarded card with last card in hand
-        state->hand[currentPlayer][handPos] = state->hand[currentPlayer][ (state->handCount[currentPlayer] - 1)];
-        //set last card to -1
-        state->hand[currentPlayer][state->handCount[currentPlayer] - 1] = -1;
-        //reduce number of cards in hand
-        state->handCount[currentPlayer]--;
-    }
+    // reduce hand count
+    state->handCount[currentPlayer]--;
 
     return 0;
 }
