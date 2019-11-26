@@ -956,14 +956,13 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
         //+1 action
         state->numActions++;
 
-        //discard card from hand
-        discardCard(handPos, currentPlayer, state, 0);
-
 		if (choice1)
         {
+            //discard card from hand
+            discardCard(handPos, currentPlayer, state, 0);
             state->coins = state->coins + 2;
         }
-        else if (choice2)		//discard hand, redraw 4, other players with 5+ cards discard hand and draw 4
+        else //if (choice2)		//discard hand, redraw 4, other players with 5+ cards discard hand and draw 4
         {
             //discard hand
             while(numHandCards(state) > 0)
