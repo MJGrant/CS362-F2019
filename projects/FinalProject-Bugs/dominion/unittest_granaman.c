@@ -353,9 +353,157 @@ void bug9() {
     }
 }
 
-void bug11() {
+void bug11a() {
     // bug 11:
-    printTestName("Bug 11", "Bug #11: [Code Cleanup] [Minion Card]");
+    printTestName("Bug 11", "Bug #11: [Code Cleanup] [Minion Card regression test]");
+
+    printTestName("Minion Card, branch 1", "Player discards Minion and gains +2 coins");
+
+    // arrange
+    struct gameState state;
+    int k[10] = {1,2,3,4,5,6,7,8,9,10};
+    int currentPlayer = 0;
+    initializeGame(2, k, 2, &state);
+    state.whoseTurn = currentPlayer;
+
+    int discardCountBefore = state.discardCount[currentPlayer];
+    int numActionsBefore = state.numActions;
+    int coinsBefore = state.coins;
+
+    // set the player's hand to a specific arrangement of cards
+    state.handCount[currentPlayer] = 4;
+    state.hand[currentPlayer][0] = baron;
+    state.hand[currentPlayer][1] = minion; // one estate in hand but shouldn't affect outcome
+    state.hand[currentPlayer][2] = copper;
+    state.hand[currentPlayer][3] = copper;
+    int handCountBefore = state.handCount[currentPlayer];
+
+    // act
+    // set choice1 (2nd param) to 1 (true) to use the "get 2 coins" card option
+    // last param is "handPos", the position of the minion card in the player's hand
+    // cardEffect(card, choice1, choice2, choice3, state, handPos, &coin_bonus)
+    cardEffect(minion, 1, 0, 0, &state, 1, 0);
+
+    // assert
+    assertIncreasedByOne("The player gained an action", numActionsBefore, state.numActions);
+
+    // verifying that the discard method was used properly
+    // some of these FAIL because the discardCard method is full of problems
+    // verify that the player's hand count decreased by one
+    assertDecreasedByOne("The player's hand size has decreased by one", handCountBefore, state.handCount[currentPlayer]);
+    // verify that the player's discard pile count went up by 1
+    assertIncreasedByOne("[EXISTING BUG] Player's discard pile count increased by 1", discardCountBefore, state.discardCount[currentPlayer]);
+    // verify that the Minion card was put in the player's discard pile
+    assertEqual("[EXISTING BUG] Minion card added to player's discard pile", state.discard[currentPlayer][state.discardCount[currentPlayer]-1], minion);
+
+    // verify minion card is no longer in the player's hand
+    int minionCountAfter = 0;
+    for (int i = 0; i < state.handCount[currentPlayer]; i++) {
+        if (state.hand[currentPlayer][i] == minion) {
+            minionCountAfter++;
+        }
+    }
+
+    // verify the correct card was discarded
+    assertEqual("The player's hand no longer contains a Minion card", minionCountAfter, 0);
+    assertEqual("The player gained +2 coins", coinsBefore+2, state.coins);
+}
+
+void bug11b() {
+    printTestName("Minion Card, branch 2", "Player uses Minion to discard their entire hand as well as the hand of the opponent who has >4 cards in hand");
+
+    // arrange
+    struct gameState state;
+    int k[10] = {1,2,3,4,5,6,7,8,9,10};
+    int currentPlayer = 0;
+    int opponentDiscardHand = 1;
+    int opponentNoDiscardHand = 2;
+    int playerCount = 3;
+    initializeGame(playerCount, k, 2, &state);
+    state.whoseTurn = currentPlayer;
+
+    // set the player's hand to a specific arrangement of cards
+    // these are going to get discarded and replaced with a hand full of coppers
+    state.handCount[currentPlayer] = 4;
+    state.hand[currentPlayer][0] = baron;
+    state.hand[currentPlayer][1] = minion;
+    state.hand[currentPlayer][2] = estate;
+    state.hand[currentPlayer][3] = silver;
+
+    // first opponent has 5 cards and should be forced to discard and redraw
+    state.handCount[opponentDiscardHand] = 5;
+    state.hand[opponentDiscardHand][0] = baron;
+    state.hand[opponentDiscardHand][1] = estate;
+    state.hand[opponentDiscardHand][2] = minion;
+    state.hand[opponentDiscardHand][3] = silver;
+    state.hand[opponentDiscardHand][4] = silver;
+
+    // second opponent has 2 cards and will not be forced to discard and redraw
+    state.handCount[opponentNoDiscardHand] = 2;
+    state.hand[opponentNoDiscardHand][0] = baron;
+    state.hand[opponentNoDiscardHand][1] = silver;
+
+    // set the players' decks so they have some cards to draw
+    state.deckCount[currentPlayer] = 6;
+    state.deckCount[opponentDiscardHand] = 6;
+    state.deckCount[opponentNoDiscardHand] = 6;
+    for (int i = 0; i < playerCount; i++) {
+        for (int j = 0; j < 6; j++) {
+            state.deck[i][j] = copper;
+        }
+    }
+
+    // save the "befores"
+    int numActionsBefore = state.numActions;
+    int coinsBefore = state.coins;
+
+    int currentPlayerDiscardCountBefore = state.discardCount[currentPlayer];
+
+    int opponentNoDiscardHandCountBefore = state.handCount[opponentNoDiscardHand];
+
+    // act
+    // set choice1 (2nd param) to 1 (true) to use the "get 2 coins" card option
+    // cardEffect(card, choice1, choice2, choice3, state, handPos, &coin_bonus)
+    cardEffect(minion, 0, 1, 0, &state, 1, 0);
+
+    // assert
+    assertIncreasedByOne("The player gained an action", numActionsBefore, state.numActions);
+    assertEqual("The player did not gain +2 coins", coinsBefore, state.coins);
+
+    // verify the player's hand has 4 cards in it
+    assertEqual("Player's new hand has 4 cards in it", 4, state.handCount[currentPlayer]);
+    // verify the player's hand is all coppers now
+    int copperCount = 0;
+    for (int i = 0; i < state.handCount[currentPlayer]; i++) {
+        if (state.hand[currentPlayer][i] == copper) {
+            copperCount++;
+        }
+    }
+    assertEqual("The player's new hand is all coppers", copperCount, state.handCount[currentPlayer]);
+    assertIncreasedByOne("[EXISTING BUG] Current player's discard pile count increased by one", currentPlayerDiscardCountBefore, state.discardCount[currentPlayer]);
+    assertEqual("[EXISTING BUG] Minion card added to current player's discard pile", state.discard[currentPlayer][state.discardCount[currentPlayer]-1], minion);
+
+    //verify "discard" opponent's hand count is now four as a result of having drawn four new cards
+    assertEqual("Opponent who started with 5 cards now has 4 cards in hand", 4, state.handCount[opponentDiscardHand]);
+    // those cards are all coppers
+    copperCount = 0;
+    for (int i = 0; i < state.handCount[opponentDiscardHand]; i++) {
+        if (state.hand[opponentDiscardHand][i] == copper) {
+            copperCount++;
+        }
+    }
+    assertEqual("Opponent who started with 5 cards now has different cards in hand", copperCount, state.handCount[opponentDiscardHand]);
+
+    //verify "no discard" opponent's hand count is still 3
+    assertEqual("Opponent who started with 2 cards still has 2 cards in hand", opponentNoDiscardHandCountBefore, state.handCount[opponentNoDiscardHand]);
+    // none of those cards are coppers (were not replaced)
+    copperCount = 0;
+    for (int i = 0; i < state.handCount[opponentNoDiscardHand]; i++) {
+        if (state.hand[opponentNoDiscardHand][i] == copper) {
+            copperCount++;
+        }
+    }
+    assertEqual("Opponent who started with 2 cards did not replace those cards with cards from deck", copperCount, 0);
 }
 
 
@@ -364,6 +512,8 @@ int main() {
     bug1();
     bug5();
     bug9();
+    bug11a();
+    bug11b();
 
     printf("[unittest_granaman] Test complete\n");
     return 0;
