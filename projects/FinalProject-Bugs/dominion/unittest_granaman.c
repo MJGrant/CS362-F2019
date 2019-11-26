@@ -197,7 +197,7 @@ void bug1() {
 
 void bug5() {
     // bug 5:
-    printTestName("Bug 5 - a", "[Scoring] When calculating player’s final score, all cards in the player's deck are counted");
+    printTestName("Bug 5", "[Scoring] When calculating player’s final score, all cards in the player's deck are counted");
 
     // simulates what happens when there are more cards in the deck than in the discard pile
 
