@@ -518,9 +518,9 @@ int main() {
 
     bug1();
     bug5();
-    //bug9();
-    //bug11a();
-    //bug11b();
+    bug9();
+    bug11a();
+    bug11b();
 
     printf("[unittest_granaman] Test complete\n");
     return 0;
