@@ -253,7 +253,7 @@ void bug5() {
     state2.deckCount[currentPlayer] = 1;
     state2.deck[currentPlayer][0] = estate;   // +1 to score
 
-    // should sum to 21 but will likely sum to 21 even if bug is unfixed
+    // should sum to 21 but will likely sum to 22 because the card in state2.deck[currentPlayer][1] is being counted
     expectedScore = 21;
 
     // act
