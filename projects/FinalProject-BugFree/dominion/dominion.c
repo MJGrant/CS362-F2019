@@ -13,6 +13,31 @@ int compare(const void* a, const void* b) {
     return 0;
 }
 
+// helper method for determining what type of card a given card is
+int getCardType(int card) {
+    int ret = -1;
+    if (card == copper || card == silver || card == gold) {
+        // treasure card
+        ret = 1;
+    } else if (card == estate || card == duchy || card == province || card == gardens) {
+        // victory card
+        ret = 2;
+    } else if (card == adventurer || card == council_room || card == feast || card == mine
+        || card == remodel || card == smithy || card == village || card == baron || card == minion
+        || card == steward || card == tribute || card == ambassador || card == cutpurse || card == embargo
+        || card == outpost || card == salvager || card == sea_hag || card == treasure_map) {
+        // action card
+        ret = 3;
+    } else if (card == great_hall) {
+        //combo action-victory card
+        ret = 4;
+    } else if (card == curse) {
+        // curse card
+        ret = 5;
+    }
+    return ret;
+}
+
 struct gameState* newGame() {
     struct gameState* g = malloc(sizeof(struct gameState));
     return g;
@@ -1053,32 +1078,42 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
 
                 shuffle(nextPlayer,state);//Shuffle the deck
             }
+
             tributeRevealedCards[0] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
-            state->deck[nextPlayer][state->deckCount[nextPlayer]--] = -1;
+            state->deck[nextPlayer][state->deckCount[nextPlayer]-1] = -1;
             state->deckCount[nextPlayer]--;
+
             tributeRevealedCards[1] = state->deck[nextPlayer][state->deckCount[nextPlayer]-1];
-            state->deck[nextPlayer][state->deckCount[nextPlayer]--] = -1;
+            state->deck[nextPlayer][state->deckCount[nextPlayer]-1] = -1;
             state->deckCount[nextPlayer]--;
         }
 
-        if (tributeRevealedCards[0] == tributeRevealedCards[1]) { //If we have a duplicate card, just drop one
+        if (getCardType(tributeRevealedCards[0]) == getCardType(tributeRevealedCards[1])) { //If we have a duplicate card, just drop one
             state->playedCards[state->playedCardCount] = tributeRevealedCards[1];
             state->playedCardCount++;
             tributeRevealedCards[1] = -1;
         }
 
-        for (i = 0; i <= 2; i ++) {
-            if (tributeRevealedCards[i] == copper || tributeRevealedCards[i] == silver || tributeRevealedCards[i] == gold) { //Treasure cards
-                state->coins += 2;
-            }
-
-            else if (tributeRevealedCards[i] == estate || tributeRevealedCards[i] == duchy || tributeRevealedCards[i] == province || tributeRevealedCards[i] == gardens || tributeRevealedCards[i] == great_hall) { //Victory Card Found
-                drawCard(currentPlayer, state);
-                drawCard(currentPlayer, state);
-            }
-            else { //Action Card
-                state->numActions = state->numActions + 2;
-            }
+        for (i = 0; i < 2; i ++) {
+            if (tributeRevealedCards[i] != -1 ) {
+                if (getCardType(tributeRevealedCards[i]) == 1) {
+                    //type 1 = treasure card
+                    state->coins += 2;
+                } else if (getCardType(tributeRevealedCards[i]) == 2) {
+                    //type 2 = victory card
+                    drawCard(currentPlayer, state);
+                    drawCard(currentPlayer, state);
+                } else if (getCardType(tributeRevealedCards[i]) == 3) {
+                    //type 3 = action card
+                    state->numActions = state->numActions + 2;
+                } else if (getCardType(tributeRevealedCards[i]) == 4) {
+                    //combo action-victory card gives actions and draw cards
+                    state->numActions = state->numActions + 2;
+                    drawCard(currentPlayer, state);
+                    drawCard(currentPlayer, state);
+                }
+                // unhandled type 5 = curse card, give nothing
+            } // if -1, do nothing
         }
 
         return 0;
