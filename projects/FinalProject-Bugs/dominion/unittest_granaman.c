@@ -234,8 +234,33 @@ void bug5() {
     int actualScore = scoreFor(currentPlayer, &state);
 
     assertEqual("Player's score was properly totaled when deck count > discard count", expectedScore, actualScore);
-}
 
+    // arrange the opposite scenario, discard count > deck count
+    struct gameState state2;
+    initializeGame(NUM_PLAYERS, k, 2, &state2);
+
+    // arrange current player's hand, deck, and discard piles
+    state2.handCount[currentPlayer] = 3;
+    state2.hand[currentPlayer][0] = estate;   // +1 to score
+    state2.hand[currentPlayer][1] = duchy;    // +3 to score
+    state2.hand[currentPlayer][2] = province; // +6 to score    // sums to 10
+
+    state2.discardCount[currentPlayer] = 3;
+    state2.discard[currentPlayer][0] = province; // +6 to score
+    state2.discard[currentPlayer][1] = estate; // +1 to score
+    state2.discard[currentPlayer][2] = duchy; // +3 to score
+
+    state2.deckCount[currentPlayer] = 1;
+    state2.deck[currentPlayer][0] = estate;   // +1 to score
+
+    // should sum to 21 but will likely sum to 21 even if bug is unfixed
+    expectedScore = 21;
+
+    // act
+    actualScore = scoreFor(currentPlayer, &state2);
+
+    assertEqual("Player's score was properly totaled when discard count > deck count", expectedScore, actualScore);
+}
 
 void bug9() {
 
