@@ -8,31 +8,6 @@
 
 #define NUM_PLAYERS 2
 
-// helper method for determining what type of card a given card is
-int getCardType(int card) {
-    int ret = -1;
-    if (card == copper || card == silver || card == gold) {
-        // treasure card
-        ret = 1;
-    } else if (card == estate || card == duchy || card == province || card == gardens) {
-        // victory card
-        ret = 2;
-    } else if (card == adventurer || card == council_room || card == feast || card == mine
-               || card == remodel || card == smithy || card == village || card == baron || card == minion
-               || card == steward || card == tribute || card == ambassador || card == cutpurse || card == embargo
-               || card == outpost || card == salvager || card == sea_hag || card == treasure_map) {
-        // action card
-        ret = 3;
-    } else if (card == great_hall) {
-        //combo action-victory card
-        ret = 4;
-    } else if (card == curse) {
-        // curse card
-        ret = 5;
-    }
-    return ret;
-}
-
 // ************************
 // Unit tests for bugs 6, 7, and 10
 
@@ -184,7 +159,6 @@ void bug7(int numOpponentDeck, int opponentDeck[2], int numOpponentDiscard, int 
     struct gameState pre;
     memcpy (&pre, &state, sizeof(struct gameState));
 
-
     // act
     // cardEffect(int card, int choice1, int choice2, int choice3, struct gameState *state, int handPos, int *bonus)
     // tribute does not use the choice parameters
@@ -201,7 +175,6 @@ void bug7(int numOpponentDeck, int opponentDeck[2], int numOpponentDiscard, int 
         assertEqual("Actions not incremented", pre.numActions, state.numActions);
         assertEqual("Coins not incremented", pre.coins, state.coins);
         assertEqual("Cards not drawn", pre.handCount[currentPlayer], state.handCount[currentPlayer]);
-        assertIncreasedByOne("Discard count incremented for played Tribute card", pre.discardCount[currentPlayer], state.discardCount[currentPlayer]);
     }
 
     // tests for reveals 1 Treasure (copper) card in deck
@@ -212,7 +185,6 @@ void bug7(int numOpponentDeck, int opponentDeck[2], int numOpponentDiscard, int 
         assertEqual("Actions not incremented", pre.numActions, state.numActions);
         assertEqual("Coins incremented by 2", pre.coins + 2, state.coins);
         assertEqual("Cards not drawn", pre.handCount[currentPlayer], state.handCount[currentPlayer]);
-        assertIncreasedByOne("Discard count incremented for played Tribute card", pre.discardCount[currentPlayer], state.discardCount[currentPlayer]);
     }
 
     // tests for reveals 1 Victory (estate) in discard and 0 in deck
@@ -222,8 +194,7 @@ void bug7(int numOpponentDeck, int opponentDeck[2], int numOpponentDiscard, int 
         // asserts
         assertEqual("Actions not incremented", pre.numActions, state.numActions);
         assertEqual("Coins not incremented", pre.coins, state.coins);
-        assertEqual("2 cards drawn", pre.handCount[currentPlayer] + 1, state.handCount[currentPlayer]);  //-1 for discarded Tribute
-        assertIncreasedByOne("Discard count incremented for played Tribute card", pre.discardCount[currentPlayer], state.discardCount[currentPlayer]);
+        assertEqual("2 cards drawn", pre.handCount[currentPlayer] + 2, state.handCount[currentPlayer]);
     }
 
     // tests for reveals 2 of same Action (adventurer) in deck
@@ -235,7 +206,6 @@ void bug7(int numOpponentDeck, int opponentDeck[2], int numOpponentDiscard, int 
         assertEqual("Actions incremented by 2", pre.numActions + 2, state.numActions);
         assertEqual("Coins not incremented", pre.coins, state.coins);
         assertEqual("Cards not drawn", pre.handCount[currentPlayer], state.handCount[currentPlayer]);
-        assertIncreasedByOne("Discard count incremented for played Tribute card", pre.discardCount[currentPlayer], state.discardCount[currentPlayer]);
     }
 
     // tests for reveals 1 Action card and 1 Treasure card in deck
@@ -247,7 +217,6 @@ void bug7(int numOpponentDeck, int opponentDeck[2], int numOpponentDiscard, int 
         assertEqual("Actions incremented by 2", pre.numActions + 2, state.numActions);
         assertEqual("Coins incremented by 2", pre.coins + 2, state.coins);
         assertEqual("Cards not drawn", pre.handCount[currentPlayer], state.handCount[currentPlayer]);
-        assertIncreasedByOne("Discard count incremented for played Tribute card", pre.discardCount[currentPlayer], state.discardCount[currentPlayer]);
     }
 
 }
