@@ -125,13 +125,13 @@ int main() {
     // Test feast card with cardToGain of cost < 5, == 5, and > 5
     bug6(1, smithy,   "Smithy");         // supply count of 1, smithy has a cost of 4
     bug6(1, tribute,  "Tribute");        // tribute has a cost of 5
-//    bug6(1, province, "Province");       // province has a cost of 8
+    bug6(1, province, "Province");       // province has a cost of 8
 
     //Test feast card with card not available in supply
-//    bug6(0, smithy, "Smithy");        // infinite loop until dominion.c fixed
+    bug6(0, smithy, "Smithy");
 
     //Test feast card with invalid card to gain
-//    bug6(1, -5, "Invalid Card");      // infinite loop until dominion.c fixed
+    bug6(1, -5, "Invalid Card");
 
     printf("\n[unittest_tayloreb] Test complete\n");
     return 0;
