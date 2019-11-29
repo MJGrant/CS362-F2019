@@ -8,6 +8,31 @@
 
 #define NUM_PLAYERS 2
 
+// helper method for determining what type of card a given card is
+int getCardType(int card) {
+    int ret = -1;
+    if (card == copper || card == silver || card == gold) {
+        // treasure card
+        ret = 1;
+    } else if (card == estate || card == duchy || card == province || card == gardens) {
+        // victory card
+        ret = 2;
+    } else if (card == adventurer || card == council_room || card == feast || card == mine
+               || card == remodel || card == smithy || card == village || card == baron || card == minion
+               || card == steward || card == tribute || card == ambassador || card == cutpurse || card == embargo
+               || card == outpost || card == salvager || card == sea_hag || card == treasure_map) {
+        // action card
+        ret = 3;
+    } else if (card == great_hall) {
+        //combo action-victory card
+        ret = 4;
+    } else if (card == curse) {
+        // curse card
+        ret = 5;
+    }
+    return ret;
+}
+
 // ************************
 // Unit tests for bugs 6, 7, and 10
 
@@ -221,6 +246,116 @@ void bug7(int numOpponentDeck, int opponentDeck[2], int numOpponentDiscard, int 
 
 }
 
+void bug10(int cardChoice, int numToReturn, char* cardName)
+{
+    printTestName("Bug 10", "[Ambassador Card] The number of cards in the player's hand "
+                            "eligible to be returned to the Supply should be correctly counted");
+    printf("\t   Selected card: %s,\tNum to return: %d\n", cardName, numToReturn);
+
+    // choice 1 is the hand position of the card to return to the supply
+    // choice 2 is the number of that card to return to the supply
+    // handPos is the position of the ambassador card itself
+
+    // arrange
+    struct gameState state;
+    int k[10] = {adventurer, council_room, feast, gardens, mine,    //Set card array - include ambassador
+                 remodel, smithy, village, ambassador, minion};
+    int currentPlayer = 1;
+    int nextPlayer = 0;
+    int randomSeed = rand();
+    initializeGame(NUM_PLAYERS, k, randomSeed, &state);
+
+    // *********************************
+    // Play the ambassador card
+
+    // arrange
+    state.whoseTurn = currentPlayer;
+
+    // arrange current player's hand
+    state.handCount[currentPlayer] = 1;
+    state.hand[currentPlayer][0] = ambassador;                      //Set ambassador card
+
+    if (numToReturn == 0) {                                         //Ensure have return card in hand
+        state.handCount[currentPlayer]++;
+        state.hand[currentPlayer][1] = cardChoice;
+    } else if (numToReturn > 0) {                                     //Fill rest of hand with return card
+        for (int i = 0; i < numToReturn; i++) {
+            state.handCount[currentPlayer]++;
+            state.hand[currentPlayer][i + 1] = cardChoice;
+        }
+    }
+
+    // arrange opponent's discard
+    state.discardCount[nextPlayer] = 0;
+
+    // set supply of selected card to check player's card(s) returned to Supply
+    state.supplyCount[cardChoice] = 0;
+
+    // save current variable states
+    struct gameState pre;
+    memcpy(&pre, &state, sizeof(struct gameState));
+
+    // check player's hand
+//    for (int i = 0; i < state.handCount[currentPlayer]; i++) {
+//        printf("Hand[%d]: %d\n", i, state.hand[currentPlayer][i]);
+//    }
+
+    // act
+    // cardEffect(int card, int choice1, int choice2, int choice3, struct gameState *state, int handPos, int *bonus)
+    // choice 1 is the hand position of the card to return to the supply
+    // choice 2 is the number of that card to return to the supply
+    int returnPosition = 1;
+    int expectedCount = 0;
+    int foundCard = 0;                      // use as bool to check for card in hand or supply
+    int ret = cardEffect(ambassador, returnPosition, numToReturn, 0, &state, 0, 0);
+
+    // tests for card choice is Ambassador
+    if (cardChoice == ambassador) {
+        assertEqual("cardEffect returned error (-1) with ambassador as card choice", ret, -1);
+        return;
+    }
+
+    // tests for invalid number to return
+    if (numToReturn < 0 || numToReturn > 2) {
+        assertEqual("cardEffect returned error (-1) with invalid number to return", ret, -1);
+        return;
+    }
+
+    // tests for choice to return 0, 1, or 2 cards
+    if (numToReturn >= 0 && numToReturn <= 2) {
+
+        // asserts
+        assertEqual("cardEffect returned successfully after played ambassador", ret, 0);
+
+        //check hand count and hand
+        expectedCount = pre.handCount[currentPlayer] - numToReturn;
+        assertEqual("Number of card choice decremented from player's hand",
+                    expectedCount, state.handCount[currentPlayer]);
+
+        foundCard = 0;
+        for (int i = 0; i < state.handCount[currentPlayer]; i++) {
+            if (state.hand[currentPlayer][i] == cardChoice) { foundCard = 1; }
+        }
+        assertEqual("Card to return not found in player's hand", foundCard, 0);
+
+        //check supply count
+        expectedCount = pre.supplyCount[cardChoice] + numToReturn;
+        assertEqual("Number of card choice added to supply",
+                    expectedCount, state.supplyCount[cardChoice]);
+
+        //check opponent's discard
+        expectedCount = pre.discardCount[nextPlayer] + numToReturn;
+        assertEqual("Number of card choice added to opponent's discard",
+                    expectedCount, state.discardCount[nextPlayer]);
+
+        foundCard = 0;
+        for (int i = 0; i < state.discardCount[nextPlayer]; i++) {
+            if (state.discard[nextPlayer][i] == cardChoice) { foundCard += 1; }
+        }
+        assertEqual("Num of card to return found in opponent's discard", foundCard, numToReturn);
+    }
+}
+
 
 int main() {
 
@@ -229,7 +364,7 @@ int main() {
     // Test feast card with cardToGain of cost < 5, == 5, and > 5
     bug6(1, smithy,   "Smithy");         // supply count of 1, smithy has a cost of 4
     bug6(1, tribute,  "Tribute");        // tribute has a cost of 5
-//    bug6(1, province, "Province");     // province has a cost of 8 - infinte loop until dominion.c fixed
+//    bug6(1, province, "Province");     // province has a cost of 8 - infinite loop until dominion.c fixed
 //    bug6(0, smithy, "Smithy");         // test card not available in supply - infinite loop until dominion.c fixed
 //    bug6(1, -5, "Invalid Card");       // test invalid card to gain - infinite loop until dominion.c fixed
 
@@ -266,6 +401,17 @@ int main() {
     opponentDeck[0] = adventurer;
     opponentDeck[1] = silver;
     bug7(2, opponentDeck, 0, opponentDiscard);
+
+    //Test Ambassador
+    // Tests for valid choices
+    bug10(estate, 0, "Estate");
+    bug10(estate, 1, "Estate");
+    bug10(estate, 2, "Estate");
+
+    // Tests for invalid choices
+    bug10(estate, -1, "Estate");
+    bug10(estate, 3, "Estate");
+    bug10(ambassador, 2, "Ambassador");
 
     printf("\n[unittest_tayloreb] Tests complete\n");
     return 0;
