@@ -21,13 +21,16 @@ runtests: testDrawCard
 	gcov dominion.c >> unittestresult.out
 	cat dominion.c.gcov >> unittestresult.out
 
-unittestresults: unittest_granaman.c unittest_tayloreb.c my_asserts.o dominion.o
+unittestresults: unittest_granaman.c unittest_tayloreb.c unittest_barwickl.c my_asserts.o dominion.o
 	echo "unittest_granaman.c:" > unittestresults.out
 	gcc -o unittest_granaman dominion.c rngs.c unittest_granaman.c my_asserts.c $(CFLAGS)
 	./unittest_granaman >> unittestresults.out
 	echo "unittest_tayloreb.c:" >> unittestresults.out
 	gcc -o unittest_tayloreb dominion.c rngs.c unittest_tayloreb.c my_asserts.c $(CFLAGS)
 	./unittest_tayloreb >> unittestresults.out
+	echo "unittest_barwickl.c:" >> unittestresults.out
+	gcc -o unittest_barwickl dominion.c rngs.c unittest_barwickl.c my_asserts.c $(CFLAGS)
+	./unittest_barwickl >> unittestresults.out	
 	echo "coverage" >> unittestresults.out
 	gcov dominion.c -b -f >> unittestresults.out
 	cat dominion.c.gcov >> unittestresults.out
