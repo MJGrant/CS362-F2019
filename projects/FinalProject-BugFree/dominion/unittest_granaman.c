@@ -393,7 +393,8 @@ void bug11a() {
     // set choice1 (2nd param) to 1 (true) to use the "get 2 coins" card option
     // last param is "handPos", the position of the minion card in the player's hand
     // cardEffect(card, choice1, choice2, choice3, state, handPos, &coin_bonus)
-    cardEffect(minion, 1, 0, 0, &state, 1, 0);
+    int bonusVar = 0;
+    cardEffect(minion, 1, 0, 0, &state, 1, &bonusVar);
 
     // assert
     assertIncreasedByOne("The player gained an action", numActionsBefore, state.numActions);
@@ -475,7 +476,8 @@ void bug11b() {
     // act
     // set choice1 (2nd param) to 1 (true) to use the "get 2 coins" card option
     // cardEffect(card, choice1, choice2, choice3, state, handPos, &coin_bonus)
-    cardEffect(minion, 0, 1, 0, &state, 1, 0);
+    int bonusVar = 0;
+    cardEffect(minion, 0, 1, 0, &state, 1, &bonusVar);
 
     // assert
     assertIncreasedByOne("The player gained an action", numActionsBefore, state.numActions);
