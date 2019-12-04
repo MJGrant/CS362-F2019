@@ -378,7 +378,6 @@ void bug11a() {
     state.whoseTurn = currentPlayer;
 
     int discardCountBefore = state.discardCount[currentPlayer];
-    int numActionsBefore = state.numActions;
 
     // set the player's hand to a specific arrangement of cards
     state.handCount[currentPlayer] = 4;
