@@ -6,6 +6,31 @@
 
 #define NUM_PLAYERS 2
 
+// helper method for determining what type of card a given card is
+int getCardType(int card) {
+    int ret = -1;
+    if (card == copper || card == silver || card == gold) {
+        // treasure card
+        ret = 1;
+    } else if (card == estate || card == duchy || card == province || card == gardens) {
+        // victory card
+        ret = 2;
+    } else if (card == adventurer || card == council_room || card == feast || card == mine
+        || card == remodel || card == smithy || card == village || card == baron || card == minion
+        || card == steward || card == tribute || card == ambassador || card == cutpurse || card == embargo
+        || card == outpost || card == salvager || card == sea_hag || card == treasure_map) {
+        // action card
+        ret = 3;
+    } else if (card == great_hall) {
+        //combo action-victory card
+        ret = 4;
+    } else if (card == curse) {
+        // curse card
+        ret = 5;
+    }
+    return ret;
+}
+
 
 // ************************
 // Unit tests for bugs 1, 5, 9, 11
@@ -174,7 +199,6 @@ void bug1() {
 
     printf("Final report:\n");
     assertEqual("Copper card was trashed", checked, passing);
-
 }
 
 void bug5() {
@@ -238,7 +262,6 @@ void bug5() {
     assertEqual("Player's score was properly totaled when discard count > deck count", expectedScore, actualScore);
 }
 
-
 void bug9() {
 
     int playerHandCountBefore;
@@ -296,12 +319,6 @@ void bug9() {
     initializeGame(NUM_PLAYERS, k, 2, &state);
     state.whoseTurn = currentPlayer;
 
-    // stuff the player's deck full of cards so these tests have enough to draw from
-    state.deckCount[currentPlayer] = 100;
-    for (int i = 0; i < state.deckCount[currentPlayer]; i++) {
-        state.deck[currentPlayer][i] = copper;
-    }
-
     // act & assert
 
     // On each loop, the opponent has two cards in their deck to offer up as tribute cards.
@@ -313,7 +330,9 @@ void bug9() {
     // instance of two cards being the same type, tests the outcome, and then does not test that type again.
     for (int i = 0; i < treasure_map; i++) {
         for (int j = 0; j < treasure_map; j++) {
-            // arrange opponent and currentPlayer back to starting state each loop
+
+            // arrange opponent and currentPlayer  back to starting state each loop
+            state.numActions = 0;
 
             state.deckCount[opponent] = 2;
             state.deck[opponent][0] = i;
@@ -322,13 +341,14 @@ void bug9() {
             state.handCount[currentPlayer] = 1;
             state.hand[currentPlayer][0] = tribute;
 
+            playerHandCountBefore = state.handCount[currentPlayer];
+            numActionsBefore = state.numActions;
+            coinsBefore = state.coins;
+
             if (getCardType(i) == getCardType(j)) {
                 int type = getCardType(i);
                 // these cards are the same type!
                 // run cardEffect and verify the outcome
-                playerHandCountBefore = state.handCount[currentPlayer];
-                numActionsBefore = state.numActions;
-                coinsBefore = state.coins;
                 cardEffect(tribute, 0, 0, 0, &state, 0, 0);
                 if (type == 1 && !testedType1) {
                     // if they are both treasure, expect +2 cards to be added to player's hand
@@ -345,7 +365,7 @@ void bug9() {
                 } else if (type == 4 && !testedType4) {
                     // if they are both action-victory, expect +2 actions AND +2 cards drawn to hand
                     assertEqual("[Two Action-Victory cards] player gained +2 actions", numActionsBefore+2, state.numActions);
-                    assertEqual("[Two Action-Victory cards] player drew +2 cards to hand", playerHandCountBefore+2, state.handCount[currentPlayer]);
+                    assertEqual("[Two Action-Victory cards] player had 2 cards and drew +2 cards to hand", playerHandCountBefore+2, state.handCount[currentPlayer]);
                     testedType4 = 1;
                 } else if (type == 5 && !testedType5) {
                     // if they are both curse, expect no changes at all
@@ -378,29 +398,25 @@ void bug11a() {
     state.whoseTurn = currentPlayer;
 
     int discardCountBefore = state.discardCount[currentPlayer];
+    int numActionsBefore = state.numActions;
+    int coinsBefore = state.coins;
 
     // set the player's hand to a specific arrangement of cards
     state.handCount[currentPlayer] = 4;
     state.hand[currentPlayer][0] = baron;
     state.hand[currentPlayer][1] = minion; // one estate in hand but shouldn't affect outcome
-    state.hand[currentPlayer][2] = copper; // worth 1
-    state.hand[currentPlayer][3] = copper; // worth 1
+    state.hand[currentPlayer][2] = copper;
+    state.hand[currentPlayer][3] = copper;
     int handCountBefore = state.handCount[currentPlayer];
-
-    state.coins = 2;
-    int coinsBefore = state.coins;
 
     // act
     // set choice1 (2nd param) to 1 (true) to use the "get 2 coins" card option
     // last param is "handPos", the position of the minion card in the player's hand
-
-    // int playCard(int handPos, int choice1, int choice2, int choice3, struct gameState *state)
     // cardEffect(card, choice1, choice2, choice3, state, handPos, &coin_bonus)
-
-    // changed to playCard on 12/3 to work with the new way bonus coins are added
-    playCard(1, 1, 0, 0, &state);
+    cardEffect(minion, 1, 0, 0, &state, 1, 0);
 
     // assert
+    assertIncreasedByOne("The player gained an action", numActionsBefore, state.numActions);
 
     // verifying that the discard method was used properly
     // some of these FAIL because the discardCard method is full of problems
@@ -479,8 +495,7 @@ void bug11b() {
     // act
     // set choice1 (2nd param) to 1 (true) to use the "get 2 coins" card option
     // cardEffect(card, choice1, choice2, choice3, state, handPos, &coin_bonus)
-    int bonusVar = 0;
-    cardEffect(minion, 0, 1, 0, &state, 1, &bonusVar);
+    cardEffect(minion, 0, 1, 0, &state, 1, 0);
 
     // assert
     assertIncreasedByOne("The player gained an action", numActionsBefore, state.numActions);
@@ -534,3 +549,4 @@ int main() {
     printf("[unittest_granaman] Test complete\n");
     return 0;
 }
+
