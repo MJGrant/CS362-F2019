@@ -920,7 +920,7 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
             int card_not_discarded = 1;//Flag for discard set!
             while(card_not_discarded) {
                 if (state->hand[currentPlayer][p] == estate) { //Found an estate card!
-                    state->coins += 4;//Add 4 coins to the amount of coins
+                    *bonus = 4;//Add 4 coins to the amount of coins
                     state->discard[currentPlayer][state->discardCount[currentPlayer]] = state->hand[currentPlayer][p];
                     state->discardCount[currentPlayer]++;
                     for (; p < state->handCount[currentPlayer]; p++) {
@@ -985,7 +985,7 @@ int cardEffect(int card, int choice1, int choice2, int choice3, struct gameState
         {
             //discard card from hand
             discardCard(handPos, currentPlayer, state, 0);
-            state->coins = state->coins + 2;
+            *bonus = 2;
         }
         else //if (choice2)		//discard hand, redraw 4, other players with 5+ cards discard hand and draw 4
         {
