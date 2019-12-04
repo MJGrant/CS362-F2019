@@ -43,7 +43,7 @@ void bug2() {
     // act - call cardeffect function
     cardEffect(mine, 1, gold, 0, &G, 0, &coinBonus);
 
-    int testnum1 = G.hand[player1][1];
+    int testnum1 = G.hand[player1][0];
 
     // assert - gained card is gold
     assertEqual("Player should be able to trash Silver to gain Gold", testnum1, gold);
@@ -65,7 +65,7 @@ void bug2() {
     // act - call cardEffect function
     cardEffect(mine, 1, silver, 0, &G, 0, &coinBonus);
 
-    int testnum2 = G.hand[player1][1];
+    int testnum2 = G.hand[player1][0];
     
     // assert - gained card is silver
     assertEqual("Player should be able to trash Copper to gain Silver", testnum2, silver);
