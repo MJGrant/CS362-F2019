@@ -379,25 +379,29 @@ void bug11a() {
 
     int discardCountBefore = state.discardCount[currentPlayer];
     int numActionsBefore = state.numActions;
-    int coinsBefore = state.coins;
 
     // set the player's hand to a specific arrangement of cards
     state.handCount[currentPlayer] = 4;
     state.hand[currentPlayer][0] = baron;
     state.hand[currentPlayer][1] = minion; // one estate in hand but shouldn't affect outcome
-    state.hand[currentPlayer][2] = copper;
-    state.hand[currentPlayer][3] = copper;
+    state.hand[currentPlayer][2] = copper; // worth 1
+    state.hand[currentPlayer][3] = copper; // worth 1
     int handCountBefore = state.handCount[currentPlayer];
+
+    state.coins = 2;
+    int coinsBefore = state.coins;
 
     // act
     // set choice1 (2nd param) to 1 (true) to use the "get 2 coins" card option
     // last param is "handPos", the position of the minion card in the player's hand
+
+    // int playCard(int handPos, int choice1, int choice2, int choice3, struct gameState *state)
     // cardEffect(card, choice1, choice2, choice3, state, handPos, &coin_bonus)
-    int bonusVar = 0;
-    cardEffect(minion, 1, 0, 0, &state, 1, &bonusVar);
+
+    // changed to playCard on 12/3 to work with the new way bonus coins are added
+    playCard(1, 1, 0, 0, &state);
 
     // assert
-    assertIncreasedByOne("The player gained an action", numActionsBefore, state.numActions);
 
     // verifying that the discard method was used properly
     // some of these FAIL because the discardCard method is full of problems
